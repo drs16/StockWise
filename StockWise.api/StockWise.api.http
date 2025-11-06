@@ -1,0 +1,6 @@
+@StockWise.api_HostAddress = http://localhost:5231
+
+GET {{StockWise.api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

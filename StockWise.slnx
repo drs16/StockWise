@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="StockWise.api/StockWise.api.csproj" Id="310b32f9-e543-452f-9e05-72107c21deec" />
+  <Project Path="StockWise.Client/StockWise.Client.csproj" Id="72ca0fc9-0abf-4d83-9207-aeba57e85b48">
+    <Deploy Solution="Debug|*" />
+  </Project>
+</Solution>
