@@ -1,12 +1,14 @@
-﻿using StockWise.api.Modelo;
-using StockWise.Api.Data;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StockWise.api.Modelo;
+using StockWise.Api.Data;
 
 namespace StockWise.Api.Controlador
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class EmpresasController : ControllerBase
     {
         private readonly AppDbContext _context;
