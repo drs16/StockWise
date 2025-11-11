@@ -1,4 +1,4 @@
-﻿using StockWise.Client.Services;
+using StockWise.Client.Services;
 
 namespace StockWise.Client.Paginas;
 
@@ -14,17 +14,8 @@ public partial class LoginPage : ContentPage
     private async void OnLoginClicked(object sender, EventArgs e)
     {
         MessageLabel.Text = "";
-        var email = EmailEntry.Text?.Trim();
+        var email = EmailEntry.Text;
         var password = PasswordEntry.Text;
-
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
-        {
-            MessageLabel.Text = "Por favor, rellena todos los campos.";
-            return;
-        }
-
-        // Muestra un pequeño indicador de carga
-        MessageLabel.Text = "Verificando credenciales...";
 
         var token = await _apiService.LoginAsync(email, password);
 
@@ -33,17 +24,12 @@ public partial class LoginPage : ContentPage
             await SecureStorage.SetAsync("jwt_token", token);
             _apiService.SetToken(token);
 
-            // 🔹 Aún no hay ProductosPage, así que mostramos mensaje de éxito
-            MessageLabel.TextColor = Colors.Green;
-            MessageLabel.Text = "Inicio de sesión correcto ✅";
-
-            // Más adelante aquí añadiremos:
-             await Navigation.PushAsync(new ProductosPage(_apiService));
+            await DisplayAlert("�xito", "Inicio de sesi�n correcto", "OK");
+            // Aqu� m�s adelante navegaremos a ProductosPage
         }
         else
         {
-            MessageLabel.TextColor = Colors.Red;
-            MessageLabel.Text = "Credenciales inválidas.";
+            MessageLabel.Text = "Credenciales inv�lidas.";
         }
     }
 }

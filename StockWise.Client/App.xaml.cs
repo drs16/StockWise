@@ -1,17 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using StockWise.Client.Paginas;
 
-namespace StockWise.Client
+namespace StockWise.Client;
+
+public partial class App : Application
 {
-    public partial class App : Application
+    public App()
     {
-        public App()
-        {
-            InitializeComponent();
-        }
-
-        protected override Window CreateWindow(IActivationState? activationState)
-        {
-            return new Window(new AppShell());
-        }
+        InitializeComponent();
+        MainPage = new AppShell(); // 🟢 Control de navegación
     }
 }

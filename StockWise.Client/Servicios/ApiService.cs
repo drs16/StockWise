@@ -10,12 +10,12 @@ public class ApiService
     private readonly HttpClient _httpClient;
     private string _token;
 
+    // 🟢 URL de la API en Render
+    private readonly string _baseUrl = "https://stockwise-api.onrender.com/api";
+
     public ApiService()
     {
-        _httpClient = new HttpClient
-        {
-            BaseAddress = new Uri("https://localhost:7013/api/")
-        };
+        _httpClient = new HttpClient();
     }
 
     public void SetToken(string token)
@@ -35,7 +35,7 @@ public class ApiService
 
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var response = await _httpClient.PostAsync("Auth/login", content);
+        var response = await _httpClient.PostAsync($"{_baseUrl}/Auth/login", content);
 
         if (!response.IsSuccessStatusCode)
             return null;
@@ -48,11 +48,7 @@ public class ApiService
 
     public async Task<List<ProductoDto>> GetProductosAsync()
     {
-        using var client = new HttpClient();
-        client.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", _token);
-
-        var response = await client.GetAsync($"{_baseUrl}/api/Productos");
+        var response = await _httpClient.GetAsync($"{_baseUrl}/Productos");
         if (!response.IsSuccessStatusCode)
             throw new Exception("Error al obtener productos.");
 
@@ -60,5 +56,4 @@ public class ApiService
         return JsonSerializer.Deserialize<List<ProductoDto>>(json,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
     }
-
 }
