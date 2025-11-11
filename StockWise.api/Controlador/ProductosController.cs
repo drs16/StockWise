@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StockWise.api.Modelo;
 using StockWise.Api.Data;
 
 namespace StockWise.api.Controlador
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductosController : ControllerBase
@@ -32,6 +34,7 @@ namespace StockWise.api.Controlador
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public async Task<ActionResult<Producto>> PostProducto(Producto producto)
         {
             _context.Productos.Add(producto);
