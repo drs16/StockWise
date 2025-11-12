@@ -45,12 +45,13 @@ var app = builder.Build();
 // 🟢 Activar autenticación
 app.UseAuthentication();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// ✅ Habilitar Swagger siempre (en dev y en producción)
+if (app.Environment.IsDevelopment() || true)
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseHttpsRedirection();
 
