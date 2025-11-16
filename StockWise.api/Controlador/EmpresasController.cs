@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using StockWise.api.Modelo;
 using StockWise.Api.Data;
 
+
 namespace StockWise.Api.Controlador
 {
     [Route("api/[controller]")]

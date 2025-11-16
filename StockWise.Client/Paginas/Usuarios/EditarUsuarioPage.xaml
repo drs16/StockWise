@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    x:Class="StockWise.Client.Paginas.Usuarios.EditarUsuarioPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Editar usuario"
+    BackgroundColor="#0A0F1C">
+
+    <VerticalStackLayout Padding="20" Spacing="15">
+
+        <Entry x:Name="NombreEntry"
+               Text="{Binding NombreUsuario}"
+               Placeholder="Nombre de usuario"
+               TextColor="White"
+               PlaceholderColor="#7DA0C0"/>
+
+        <Entry x:Name="EmailEntry"
+               Text="{Binding Email}"
+               Placeholder="Email"
+               TextColor="White"
+               PlaceholderColor="#7DA0C0"
+               Keyboard="Email"/>
+
+        <Entry x:Name="PasswordEntry"
+               Placeholder="Nueva contraseña (opcional)"
+               TextColor="White"
+               PlaceholderColor="#7DA0C0"
+               IsPassword="True"/>
+        
+        <Picker x:Name="RolPicker"
+        SelectedItem="{Binding Rol}">
+            <Picker.Items>
+                <x:String>Administrador</x:String>
+                <x:String>Empleado</x:String>
+            </Picker.Items>
+        </Picker>
+
+        <Button Text="Guardar cambios"
+                BackgroundColor="#4EE1A0"
+                TextColor="#0A0F1C"
+                CornerRadius="10"
+                HeightRequest="45"
+                Clicked="OnGuardarClicked"/>
+
+    </VerticalStackLayout>
+</ContentPage>

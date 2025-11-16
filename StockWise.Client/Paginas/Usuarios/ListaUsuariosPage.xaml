@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="StockWise.Client.Paginas.Usuarios.ListaUsuariosPage"
+             Title="Gestión de usuarios"
+             BackgroundColor="#0A0F1C">
+
+    <VerticalStackLayout Padding="20" Spacing="15">
+        <Grid RowDefinitions="Auto, *">
+
+            <!-- ============================================================= -->
+            <!-- 🔥 FILA 0: HEADER con menú hamburguesa -->
+            <!-- ============================================================= -->
+            <Grid Grid.Row="0"
+          ColumnDefinitions="Auto, *"
+          Padding="15,20">
+
+                <!-- Botón hamburguesa -->
+                <Frame Padding="5"
+               BackgroundColor="Transparent"
+               HasShadow="False"
+               HorizontalOptions="Start"
+               VerticalOptions="Center">
+
+                    <Label Text="☰"
+                   FontSize="32"
+                   TextColor="White">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnMenuToggleClicked"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                </Frame>
+
+                <Label Grid.Column="1"
+               Text="QRStock - Usuarios"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               FontSize="22"
+               FontAttributes="Bold"
+               TextColor="#4EE1A0"/>
+            </Grid>
+
+
+            <!-- ============================================================= -->
+            <!-- 🔥 FILA 1: CONTENIDO (todo lo que ya tenías) -->
+            <!-- ============================================================= -->
+            <VerticalStackLayout Grid.Row="1"
+                         Padding="20"
+                         Spacing="15">
+                <StackLayout x:Name="MenuContainer"
+             Grid.Row="0"
+             Margin="15,70,0,0"
+             Padding="10"
+             BackgroundColor="#121A2A"
+             WidthRequest="200"
+             HeightRequest="160"
+             Opacity="0.92"
+             IsVisible="False"
+             HorizontalOptions="Start"
+             VerticalOptions="Start"
+             Spacing="10">
+
+                    <Button Text="👤 Mi perfil"
+            BackgroundColor="#1E2A44"
+            TextColor="White"
+            CornerRadius="10"
+            HeightRequest="40"
+            WidthRequest="170"
+            Clicked="OnPerfilClicked"/>
+
+                    <Button Text="📦 Productos"
+        BackgroundColor="#1E2A44"
+        TextColor="White"
+        CornerRadius="10"
+        HeightRequest="40"
+        WidthRequest="170"
+        Clicked="OnProductosClicked"/>
+
+                    <Button Text="🚪 Cerrar sesión"
+            BackgroundColor="#c62828"
+            TextColor="White"
+            CornerRadius="10"
+            HeightRequest="40"
+            WidthRequest="170"
+            Clicked="OnLogoutClicked"/>
+
+                </StackLayout>
+
+
+            </VerticalStackLayout>
+
+        </Grid>
+
+        <!-- Botón crear usuario -->
+        <Button Text="+ Crear usuario"
+                BackgroundColor="#4EE1A0"
+                TextColor="#0A0F1C"
+                CornerRadius="12"
+                HeightRequest="45"
+                Clicked="OnCrearUsuarioClicked"/>
+
+        <!-- CABECERA -->
+        <Frame BackgroundColor="#121A2A"
+       CornerRadius="10"
+       Padding="5"
+       HasShadow="False">
+
+            <Grid ColumnDefinitions="3*,3*,2*,Auto,Auto">
+
+                <Label Text="Usuario"
+               TextColor="#4EE1A0"
+               FontAttributes="Bold"/>
+
+                <Label Grid.Column="1"
+               Text="Email"
+               TextColor="#4EE1A0"
+               FontAttributes="Bold"/>
+
+                <Label Grid.Column="2"
+               Text="Rol"
+               TextColor="#4EE1A0"
+               FontAttributes="Bold"/>
+
+                <!-- columnas 3 y 4 vacías -->
+                <Label Grid.Column="3"/>
+                <Label Grid.Column="4"/>
+
+            </Grid>
+        </Frame>
+
+
+
+        <!-- LISTA -->
+        <CollectionView x:Name="UsuariosList"
+                        ItemsSource="{Binding Usuarios}"
+                        SelectionMode="None">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame BackgroundColor="#121A2A"
+                           CornerRadius="10"
+                           Padding="10"
+                           Margin="0,5"
+                           HasShadow="False">
+
+                        <Grid ColumnDefinitions="3*,3*,2*,Auto,Auto"
+      Padding="15,0">
+
+                            <Label Text="{Binding NombreUsuario}" TextColor="White"/>
+
+                            <Label Grid.Column="1"
+           Text="{Binding Email}"
+           TextColor="#7DA0C0"/>
+
+                            <Label Grid.Column="2"
+           Text="{Binding Rol}"
+           TextColor="#4EE1A0"
+                                   Padding="30,0"/>
+
+                            <Button Grid.Column="3"
+            Text="✏️"
+            BackgroundColor="Transparent"
+            TextColor="#4EE1A0"
+            Clicked="OnEditarClicked"
+            BindingContext="{Binding}" />
+
+                            <Button Grid.Column="4"
+            Text="🗑"
+            BackgroundColor="Transparent"
+            TextColor="#c62828"
+            Clicked="OnEliminarClicked"
+            BindingContext="{Binding}" />
+
+                        </Grid>
+
+
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </VerticalStackLayout>
+
+</ContentPage>

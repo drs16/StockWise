@@ -1,23 +1,206 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="StockWise.Client.Paginas.ProductosPage"
-             Title="Productos">
-    <VerticalStackLayout Padding="20" Spacing="15">
-        <Button Text="🔄 Actualizar" Clicked="OnRefreshClicked" />
-        <CollectionView x:Name="ProductosList">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame BorderColor="#ccc" CornerRadius="10" Padding="10">
-                        <VerticalStackLayout>
-                            <Label Text="{Binding Nombre}" FontAttributes="Bold" />
-                            <Label Text="{Binding Proveedor}" FontSize="12" />
-                            <Label Text="{Binding Precio, StringFormat='Precio: {0:C}'}" />
-                        </VerticalStackLayout>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-        <Label x:Name="MessageLabel" TextColor="Red" />
-    </VerticalStackLayout>
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="StockWise.Client.Paginas.ProductosPage"
+    BackgroundColor="#0A0F1C">
+
+    <!-- GRID PRINCIPAL -->
+    <Grid RowDefinitions="Auto, Auto, Auto, *, Auto, Auto">
+
+        <!-- ================================================================= -->
+        <!-- 🔥 FILA 0: HEADER -->
+        <!-- ================================================================= -->
+        <Grid Grid.Row="0"
+              ColumnDefinitions="Auto, *"
+              Padding="15,20">
+
+            <!-- Botón hamburguesa -->
+            <Frame Padding="5"
+                   BackgroundColor="Transparent"
+                   HasShadow="False"
+                   HorizontalOptions="Start"
+                   VerticalOptions="Center">
+
+                <Label Text="☰"
+                       FontSize="32"
+                       TextColor="White">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnMenuToggleClicked"/>
+                    </Label.GestureRecognizers>
+                </Label>
+
+            </Frame>
+
+            <Label Grid.Column="1"
+                   Text="QRStock - Productos"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   TextColor="#4EE1A0"/>
+        </Grid>
+
+
+
+        <!-- ================================================================= -->
+        <!-- 🔥 FILA 1: MENÚ DESPLEGABLE -->
+        <!-- ================================================================= -->
+        <StackLayout x:Name="MenuContainer"
+             Grid.Row="1"
+             Padding="10"
+             BackgroundColor="#121A2A"
+             WidthRequest="200"
+             HeightRequest="160"
+             Opacity="0.92"
+             IsVisible="False"
+             HorizontalOptions="Start"
+             VerticalOptions="Start"
+             Margin="15,10,0,0"
+             Spacing="10">
+
+            <Grid ColumnDefinitions="Auto">
+                <Button Text="👤 Mi perfil"
+                        BackgroundColor="#1E2A44"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="40"
+                        WidthRequest="170"
+                        HorizontalOptions="Start"
+                        Clicked="OnPerfilClicked"/>
+            </Grid>
+
+            <Grid ColumnDefinitions="Auto">
+                <Button Text="👥 Usuarios (Admin)"
+                        BackgroundColor="#1E2A44"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="40"
+                        WidthRequest="170"
+                        HorizontalOptions="Start"
+                        x:Name="BtnAdmin"
+                        Clicked="OnAdminClicked"/>
+            </Grid>
+
+            <Grid ColumnDefinitions="Auto">
+                <Button Text="🚪 Cerrar sesión"
+                        BackgroundColor="#c62828"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="40"
+                        WidthRequest="170"
+                        HorizontalOptions="Start"
+                        Clicked="OnLogoutClicked"/>
+            </Grid>
+
+        </StackLayout>
+
+
+
+        <!-- ================================================================= -->
+        <!-- 🔥 FILA 2: BOTÓN AÑADIR PRODUCTO -->
+        <!-- ================================================================= -->
+        <Button Grid.Row="2"
+                Text="+ Añadir producto"
+                BackgroundColor="#4EE1A0"
+                TextColor="#0A0F1C"
+                FontAttributes="Bold"
+                CornerRadius="15"
+                HeightRequest="45"
+                Margin="20,10"
+                Clicked="OnCrearProductoClicked"/>
+
+
+
+        <!-- ================================================================= -->
+        <!-- 🔥 FILA 3: LISTA DE PRODUCTOS -->
+        <!-- ================================================================= -->
+        <Grid Grid.Row="3" Padding="20">
+
+            <CollectionView x:Name="ProductosList"
+                            IsVisible="False"
+                            SelectionMode="Single"
+                            SelectionChanged="ProductosList_SelectionChanged">
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame CornerRadius="12"
+                               Margin="0,8"
+                               Padding="12"
+                               BackgroundColor="#121A2A"
+                               BorderColor="#1E2A44"
+                               HasShadow="True">
+
+                            <Grid ColumnDefinitions="*,Auto">
+
+                                <VerticalStackLayout>
+                                    <Label Text="{Binding Nombre}" FontSize="18" FontAttributes="Bold" TextColor="White"/>
+                                    <Label Text="{Binding Proveedor}" FontSize="14" TextColor="#7DA0C0"/>
+                                    <Label Text="Cantidad:" FontSize="13" TextColor="#4EE1A0" FontAttributes="Bold"/>
+                                    <Label Text="{Binding Cantidad}" FontSize="13" TextColor="#4EE1A0"/>
+                                </VerticalStackLayout>
+
+                                <Label Grid.Column="1"
+                                       Text="{Binding Precio, StringFormat='€{0:F2}'}"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center"
+                                       TextColor="#4EE1A0"/>
+                            </Grid>
+
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <StackLayout x:Name="EmptyState"
+                         IsVisible="False"
+                         VerticalOptions="Center"
+                         HorizontalOptions="Center">
+
+                <Image Source="empty.png" HeightRequest="150" Opacity="0.8"/>
+                <Label Text="No hay productos disponibles"
+                       FontSize="16"
+                       TextColor="#7DA0C0"
+                       HorizontalOptions="Center"/>
+            </StackLayout>
+
+            <ActivityIndicator x:Name="LoadingIndicator"
+                               IsVisible="False"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               Color="#4EE1A0"/>
+        </Grid>
+
+
+
+        <!-- ================================================================= -->
+        <!-- 🔥 FILA 4: BOTÓN IMPORTAR CSV -->
+        <!-- ================================================================= -->
+        <Button Grid.Row="4"
+                Text="📦 Importar CSV"
+                BackgroundColor="#4EE1A0"
+                TextColor="#0A0F1C"
+                FontAttributes="Bold"
+                HeightRequest="48"
+                CornerRadius="18"
+                Margin="20,10"
+                Clicked="OnImportarClicked"/>
+
+
+
+        <!-- ================================================================= -->
+        <!-- 🔥 FILA 5: BOTÓN ESCANEAR QR -->
+        <!-- ================================================================= -->
+        <Button Grid.Row="5"
+                Text="📷 Escanear QR"
+                BackgroundColor="#4EE1A0"
+                TextColor="#0A0F1C"
+                FontAttributes="Bold"
+                HeightRequest="48"
+                CornerRadius="18"
+                Margin="20,0,20,20"
+                Clicked="OnScanearClicked"/>
+
+    </Grid>
 </ContentPage>

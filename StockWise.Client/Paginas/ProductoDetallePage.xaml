@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    x:Class="StockWise.Client.Paginas.ProductoDetallePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Detalle del producto"
+    BackgroundColor="#E8F8F6">
+    
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="20">
+            <Button Text="← Volver"
+        Clicked="OnVolverClicked"
+        BackgroundColor="#121A2A"
+        TextColor="White"
+        CornerRadius="10"
+        FontAttributes="Bold"
+        HeightRequest="45"
+        HorizontalOptions="Start"
+        WidthRequest="120"/>
+
+            <!-- Nombre del producto -->
+            <Label x:Name="NombreLabel"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   TextColor="#01796f"/>
+
+            <!-- Imagen del QR -->
+            <Frame Padding="10" CornerRadius="15" BackgroundColor="White" HasShadow="True">
+                <Image x:Name="QrImage" HeightRequest="200"/>
+            </Frame>
+
+            <!-- Datos del producto -->
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto">
+
+                <Label Text="Proveedor:" Grid.Row="0" Grid.Column="0" TextColor="Gray"/>
+                <Label x:Name="ProveedorLabel" Grid.Row="0" Grid.Column="1"/>
+
+                <Label Text="Cantidad:" Grid.Row="1" Grid.Column="0" TextColor="Gray"/>
+                <Label x:Name="CantidadLabel" Grid.Row="1" Grid.Column="1"/>
+
+                <Label Text="Precio:" Grid.Row="2" Grid.Column="0" TextColor="Gray"/>
+                <Label x:Name="PrecioLabel" Grid.Row="2" Grid.Column="1"/>
+            </Grid>
+
+            <!-- Botones -->
+            <HorizontalStackLayout Spacing="10">
+
+                <Button Text="Editar"
+                        Clicked="OnEditarClicked"
+                        BackgroundColor="#00A79D"
+                        TextColor="White"
+                        CornerRadius="10"
+                        WidthRequest="120"/>
+
+                <Button Text="Eliminar"
+                        Clicked="OnEliminarClicked"
+                        BackgroundColor="#c62828"
+                        TextColor="White"
+                        CornerRadius="10"
+                        WidthRequest="120"/>
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

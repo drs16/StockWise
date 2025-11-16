@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="StockWise.Client.Paginas.CrearProductoPage"
+             Title="Nuevo Producto">
+
+    <VerticalStackLayout Padding="20">
+
+        <Entry x:Name="NombreEntry" Placeholder="Nombre" />
+        <Entry x:Name="ProveedorEntry" Placeholder="Proveedor" />
+        <Entry x:Name="CantidadEntry" Placeholder="Cantidad" Keyboard="Numeric"/>
+        <Entry x:Name="PrecioEntry" Placeholder="Precio" Keyboard="Numeric"/>
+
+        <Button Text="Guardar"
+                Clicked="OnGuardarClicked"
+                BackgroundColor="#00C3FF"
+                TextColor="White"/>
+    </VerticalStackLayout>
+</ContentPage>

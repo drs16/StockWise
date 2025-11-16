@@ -1,22 +1,23 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using StockWise.api.Servicios;
 using StockWise.Api.Data;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 // Conexión a SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=stockwise.db"));
 
-
-// 🟢 Configurar TokenService
+// Servicios
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddSingleton<QRService>();
 
-// 🟢 Configurar Autenticación JWT
+
+// Autenticación JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -33,30 +34,65 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             )
         };
     });
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// ✅ Swagger con soporte para JWT
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "StockWise API",
+        Version = "v1",
+        Description = "API REST de StockWise con autenticación JWT"
+    });
+
+    // 🔐 Definición del esquema JWT
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Introduce el token JWT así: **Bearer {tu_token}**"
+    });
+
+    // 🔒 Requerir autenticación para operaciones protegidas
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 var app = builder.Build();
 
-// 🟢 Activar autenticación
 app.UseAuthentication();
 
-// ✅ Habilitar Swagger siempre (en dev y en producción)
+// ✅ Habilitar Swagger también en producción
 if (app.Environment.IsDevelopment() || true)
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "StockWise API v1");
+        c.RoutePrefix = "swagger"; // accesible desde /swagger
+    });
 }
 
-
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

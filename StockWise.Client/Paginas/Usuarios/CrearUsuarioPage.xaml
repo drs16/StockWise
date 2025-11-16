@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    x:Class="StockWise.Client.Paginas.Usuarios.CrearUsuarioPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Crear usuario"
+    BackgroundColor="#0A0F1C">
+
+    <VerticalStackLayout Padding="20" Spacing="15">
+
+        <Entry x:Name="NombreEntry"
+               Placeholder="Nombre de usuario"
+               TextColor="White"
+               PlaceholderColor="#7DA0C0"/>
+
+        <Entry x:Name="EmailEntry"
+               Placeholder="Email"
+               TextColor="White"
+               PlaceholderColor="#7DA0C0"
+               Keyboard="Email"/>
+
+        <Entry x:Name="PasswordEntry"
+               Placeholder="Contraseña"
+               TextColor="White"
+               PlaceholderColor="#7DA0C0"
+               IsPassword="True"/>
+
+        <Picker x:Name="RolPicker"
+                Title="Seleccionar rol"
+                TitleColor="#7DA0C0"
+                TextColor="White">
+            <Picker.Items>
+                <x:String>Administrador</x:String>
+                <x:String>Empleado</x:String>
+            </Picker.Items>
+        </Picker>
+
+        <Button Text="Crear usuario"
+                BackgroundColor="#4EE1A0"
+                TextColor="#0A0F1C"
+                CornerRadius="10"
+                HeightRequest="45"
+                Clicked="OnCrearClicked"/>
+
+    </VerticalStackLayout>
+</ContentPage>
