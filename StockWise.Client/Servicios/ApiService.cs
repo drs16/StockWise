@@ -50,7 +50,7 @@ public class ApiService
 
             var json = JsonSerializer.Serialize(new
             {
-                email = email,
+                Email = email,
                 passwordHash = password
             });
 
@@ -73,7 +73,10 @@ public class ApiService
 
             if (!response.IsSuccessStatusCode)
             {
-                await Application.Current.MainPage.DisplayAlert("Error", $"Error HTTP {response.StatusCode}", "OK");
+                var body = await response.Content.ReadAsStringAsync();
+                await Application.Current.MainPage.DisplayAlert("Error",
+                    $"HTTP {response.StatusCode}\n{body}",
+                    "OK");
                 return null;
             }
 
@@ -81,6 +84,33 @@ public class ApiService
             var token = doc.RootElement.GetProperty("token").GetString();
 
             Console.WriteLine($"[CLIENT-LOGIN] Token recibido correctamente (longitud: {token?.Length ?? 0})");
+
+            // Leer JWT
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(token);
+
+            // Guardar datos en SecureStorage
+            // NOMBRE DE USUARIO (claim estándar de Microsoft)
+            var claimNombre = jwt.Claims
+                .FirstOrDefault(c => c.Type.Contains("identity/claims/name"))
+                ?.Value ?? "";
+
+            await SecureStorage.SetAsync("usuario_nombre", claimNombre);
+
+            // ROL DEL USUARIO
+            var claimRol = jwt.Claims
+                .FirstOrDefault(c => c.Type.Contains("identity/claims/role"))
+                ?.Value ?? "";
+
+            await SecureStorage.SetAsync("usuario_rol", claimRol);
+
+            // EMPRESA ID
+            var claimEmpresa = jwt.Claims
+                .FirstOrDefault(c => c.Type == "EmpresaId")
+                ?.Value ?? "";
+
+            await SecureStorage.SetAsync("empresa_id", claimEmpresa);
+
 
             return token;
         }
@@ -136,18 +166,32 @@ public class ApiService
     {
         try
         {
-            Console.WriteLine("[CLIENT-PRODUCTOS] Solicitando lista de productos...");
+            Console.WriteLine("[CLIENT-PRODUCTOS] Solicitando lista de productos por empresa...");
 
-            var response = await _httpClient.GetAsync("Productos");
+            // Recuperar empresa del usuario logueado
+            var empresaIdString = await SecureStorage.GetAsync("empresa_id");
+            if (string.IsNullOrEmpty(empresaIdString))
+            {
+                Console.WriteLine("[CLIENT-PRODUCTOS] No se encontró empresa_id");
+                await Application.Current.MainPage.DisplayAlert("Error", "No se encontró empresa asociada al usuario.", "OK");
+                return new List<ProductoDto>();
+            }
+
+            int empresaId = int.Parse(empresaIdString);
+
+            // Llamar al endpoint filtrado
+            var response = await _httpClient.GetAsync($"Productos/porEmpresa/{empresaId}");
 
             Console.WriteLine($"[CLIENT-PRODUCTOS] HTTP Status: {(int)response.StatusCode} - {response.StatusCode}");
 
             var json = await response.Content.ReadAsStringAsync();
-
-            Console.WriteLine($"[CLIENT-PRODUCTOS] Respuesta completa: {json}");
+            Console.WriteLine($"[CLIENT-PRODUCTOS] Respuesta: {json}");
 
             if (!response.IsSuccessStatusCode)
-                throw new Exception($"Error al obtener productos: {response.StatusCode}");
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "No se pudieron obtener los productos.", "OK");
+                return new List<ProductoDto>();
+            }
 
             var productos = JsonSerializer.Deserialize<List<ProductoDto>>(json,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
@@ -163,6 +207,7 @@ public class ApiService
             return new List<ProductoDto>();
         }
     }
+
 
     public async Task<bool> ImportarProductosAsync(List<ProductoDto> productos)
     {
@@ -262,4 +307,48 @@ public class ApiService
 
         return jwt.Claims.FirstOrDefault(c => c.Type == claimType)?.Value;
     }
+
+    public async Task<byte[]> ExportarCSVAsync(int empresaId)
+    {
+        var response = await _httpClient.GetAsync($"Productos/exportar/{empresaId}");
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        return await response.Content.ReadAsByteArrayAsync();
+    }
+
+    public async Task<EmpresaDto?> ObtenerMiEmpresaAsync()
+    {
+        var empresaIdString = await SecureStorage.GetAsync("empresa_id");
+
+        if (string.IsNullOrEmpty(empresaIdString))
+            return null;
+
+        int empresaId = int.Parse(empresaIdString);
+
+        var response = await _httpClient.GetAsync($"Empresas/{empresaId}");
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        return JsonSerializer.Deserialize<EmpresaDto>(json,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+    }
+
+
+    public async Task<bool> ActualizarEmpresaAsync(int id, EmpresaDto empresa)
+    {
+        var json = JsonSerializer.Serialize(empresa);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await _httpClient.PutAsync($"Empresas/{id}", content);
+
+        return response.IsSuccessStatusCode;
+    }
+
+
+
 }

@@ -67,6 +67,9 @@
 	  <Compile Update="Paginas\LoginPage.xaml.cs">
 	    <DependentUpon>LoginPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Paginas\MiPerfilPage.xaml.cs">
+	    <DependentUpon>MiPerfilPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Paginas\ProductoDetallePage.xaml.cs">
 	    <DependentUpon>ProductoDetallePage.xaml</DependentUpon>
 	  </Compile>
@@ -79,10 +82,16 @@
 	  <MauiXaml Update="Paginas\CrearProductoPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Paginas\EditarEmpresaPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Paginas\EditarProductoPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Paginas\LoginPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Paginas\MiPerfilPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Paginas\ProductoDetallePage.xaml">

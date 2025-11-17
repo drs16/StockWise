@@ -64,5 +64,50 @@ namespace StockWise.api.Controlador
         {
             return HashPassword(enteredPassword) == storedHash;
         }
+
+
+        [AllowAnonymous]
+        [HttpPost("registroInicial")]
+        public async Task<ActionResult> RegistroInicial(RegistroInicialDto dto)
+        {
+            // 1️⃣ Crear empresa
+            var empresa = new Empresa
+            {
+                Nombre = dto.NombreEmpresa,
+                NIF = dto.NIF,
+                Direccion = dto.Direccion,
+                Email = dto.EmailEmpresa,
+                Telefono = dto.TelefonoEmpresa
+            };
+
+            _context.Empresas.Add(empresa);
+            await _context.SaveChangesAsync(); // aquí empresa.Id ya tiene valor
+
+            // 2️⃣ Crear usuario administrador
+            var usuarioAdmin = new Usuario
+            {
+                NombreUsuario = dto.AdminNombre,
+                Email = dto.AdminEmail,
+                PasswordHash = HashPassword(dto.Password),
+                Rol = "Administrador",
+                EmpresaId = empresa.Id
+            };
+
+            _context.Usuarios.Add(usuarioAdmin);
+            await _context.SaveChangesAsync();
+
+            // 3️⃣ Crear token JWT
+            var token = _tokenService.GenerateToken(usuarioAdmin);
+
+            // 4️⃣ Devolverlo todo
+            return Ok(new
+            {
+                empresaId = empresa.Id,
+                usuarioId = usuarioAdmin.Id,
+                token = token
+            });
+        }
+
     }
+
 }

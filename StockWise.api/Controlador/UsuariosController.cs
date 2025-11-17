@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using StockWise.api.Modelo;
 using StockWise.Api.Data;
+using System.Text;
 
 namespace StockWise.api.Controlador
 {
@@ -34,10 +35,17 @@ namespace StockWise.api.Controlador
         [HttpPost]
         public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
         {
+            // Aplicar hash a la contraseña
+            using var sha = System.Security.Cryptography.SHA256.Create();
+            var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(usuario.PasswordHash));
+            usuario.PasswordHash = Convert.ToBase64String(bytes);
+
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetUsuario), new { id = usuario.Id }, usuario);
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUsuario(int id, Usuario usuario)

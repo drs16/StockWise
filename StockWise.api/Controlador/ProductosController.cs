@@ -36,11 +36,6 @@ namespace StockWise.api.Controlador
         }
 
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Producto>>> GetProductos()
-        {
-            return await _context.Productos.ToListAsync();
-        }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Producto>> GetProducto(int id)
@@ -162,6 +157,40 @@ namespace StockWise.api.Controlador
 
             return NoContent();
         }
+
+        [HttpGet("porEmpresa/{empresaId}")]
+        public async Task<ActionResult<IEnumerable<Producto>>> GetProductosPorEmpresa(int empresaId)
+        {
+            var productos = await _context.Productos
+                .Where(p => p.EmpresaId == empresaId)
+                .ToListAsync();
+
+            return Ok(productos);
+        }
+
+        [HttpGet("exportar/{empresaId}")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> ExportarCSV(int empresaId)
+        {
+            var productos = await _context.Productos
+                .Where(p => p.EmpresaId == empresaId)
+                .ToListAsync();
+
+            if (!productos.Any())
+                return BadRequest("No hay productos para exportar.");
+
+            var sb = new StringBuilder();
+            sb.AppendLine("Nombre,Proveedor,Cantidad,Precio,CodigoQR");
+
+            foreach (var p in productos)
+                sb.AppendLine($"{p.Nombre},{p.Proveedor},{p.Cantidad},{p.Precio},{p.CodigoQR}");
+
+            var bytes = Encoding.UTF8.GetBytes(sb.ToString());
+
+            return File(bytes, "text/csv", $"productos_empresa_{empresaId}.csv");
+        }
+
+
 
     }
 }

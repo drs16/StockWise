@@ -75,6 +75,7 @@
         CornerRadius="10"
         HeightRequest="40"
         WidthRequest="170"
+        x:Name="BtnProductos"                    
         Clicked="OnProductosClicked"/>
 
                     <Button Text="🚪 Cerrar sesión"
@@ -98,6 +99,7 @@
                 TextColor="#0A0F1C"
                 CornerRadius="12"
                 HeightRequest="45"
+                x:Name="BtnCrearUsuario"
                 Clicked="OnCrearUsuarioClicked"/>
 
         <!-- CABECERA -->

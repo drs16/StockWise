@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StockWise.Client.Paginas.MiPerfilPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Mi Perfil"
+    BackgroundColor="#0A0F1C">
+
+    <VerticalStackLayout Padding="30" Spacing="20">
+
+        <Label Text="Mi Perfil"
+               FontSize="26"
+               FontAttributes="Bold"
+               HorizontalOptions="Center"
+               TextColor="#4EE1A0"/>
+
+        <Label x:Name="NombreLabel"
+               Text="Usuario: "
+               TextColor="White"
+               FontSize="16" />
+
+        <Label x:Name="EmailLabel"
+               Text="Email: "
+               TextColor="White"
+               FontSize="16" />
+
+        <Label x:Name="RolLabel"
+               Text="Rol: "
+               TextColor="White"
+               FontSize="16" />
+
+        <Label x:Name="EmpresaLabel"
+               Text="Empresa ID: "
+               TextColor="White"
+               FontSize="16" />
+
+    </VerticalStackLayout>
+</ContentPage>

@@ -6,7 +6,7 @@
     BackgroundColor="#0A0F1C">
 
     <!-- GRID PRINCIPAL -->
-    <Grid RowDefinitions="Auto, Auto, Auto, *, Auto, Auto">
+    <Grid RowDefinitions="Auto, Auto, Auto, *, Auto, Auto, Auto">
 
         <!-- ================================================================= -->
         <!-- 🔥 FILA 0: HEADER -->
@@ -51,7 +51,7 @@
              Padding="10"
              BackgroundColor="#121A2A"
              WidthRequest="200"
-             HeightRequest="160"
+             HeightRequest="auto"
              Opacity="0.92"
              IsVisible="False"
              HorizontalOptions="Start"
@@ -69,7 +69,19 @@
                         HorizontalOptions="Start"
                         Clicked="OnPerfilClicked"/>
             </Grid>
-
+            
+            <Grid ColumnDefinitions="Auto">
+                <Button Text="🏢 Editar empresa"
+                BackgroundColor="#1E2A44"
+                TextColor="White"
+                CornerRadius="10"
+                HeightRequest="40"
+                WidthRequest="170"
+                HorizontalOptions="Start"
+                x:Name="BtnEditarEmpresa"
+                Clicked="OnEditarEmpresaClicked"/>
+            </Grid>
+            
             <Grid ColumnDefinitions="Auto">
                 <Button Text="👥 Usuarios (Admin)"
                         BackgroundColor="#1E2A44"
@@ -100,7 +112,8 @@
         <!-- ================================================================= -->
         <!-- 🔥 FILA 2: BOTÓN AÑADIR PRODUCTO -->
         <!-- ================================================================= -->
-        <Button Grid.Row="2"
+        <Button x:Name="BtnCrearProducto"
+                Grid.Row="2"
                 Text="+ Añadir producto"
                 BackgroundColor="#4EE1A0"
                 TextColor="#0A0F1C"
@@ -185,14 +198,28 @@
                 HeightRequest="48"
                 CornerRadius="18"
                 Margin="20,10"
+                x:Name="BtnImportar"
                 Clicked="OnImportarClicked"/>
 
 
-
         <!-- ================================================================= -->
-        <!-- 🔥 FILA 5: BOTÓN ESCANEAR QR -->
+        <!-- 🔥 FILA 5: BOTÓN EXPORTAR CSV -->
         <!-- ================================================================= -->
         <Button Grid.Row="5"
+        Text="📤 Exportar CSV"
+        BackgroundColor="#4EE1A0"
+        TextColor="#0A0F1C"
+        FontAttributes="Bold"
+        HeightRequest="48"
+        CornerRadius="18"
+        Margin="20,0,20,10"
+        x:Name="BtnExportar"
+        Clicked="OnExportarClicked"/>
+
+        <!-- ================================================================= -->
+        <!-- 🔥 FILA 6: BOTÓN ESCANEAR QR -->
+        <!-- ================================================================= -->
+        <Button Grid.Row="6"
                 Text="📷 Escanear QR"
                 BackgroundColor="#4EE1A0"
                 TextColor="#0A0F1C"

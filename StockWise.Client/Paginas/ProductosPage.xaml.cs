@@ -1,5 +1,7 @@
 ﻿using StockWise.Client.Modelo;
 using StockWise.Client.Services;
+using Microsoft.Maui.ApplicationModel.DataTransfer;
+
 
 namespace StockWise.Client.Paginas;
 
@@ -19,6 +21,7 @@ public partial class ProductosPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        await AplicarPermisosUsuario();
         await CargarProductosAsync();
     }
 
@@ -44,6 +47,7 @@ public partial class ProductosPage : ContentPage
                 ProductosList.ItemsSource = productos;
                 ProductosList.IsVisible = true;
                 EmptyState.IsVisible = false;
+
             }
         }
         catch (Exception ex)
@@ -201,15 +205,6 @@ public partial class ProductosPage : ContentPage
         }
     }
 
-
-
-    private async void OnPerfilClicked(object sender, EventArgs e)
-    {
-        await CloseMenu();
-        await DisplayAlert("Perfil", "Tu información aquí.", "OK");
-    }
-
-
     private async void OnAdminClicked(object sender, EventArgs e)
     {
         await CloseMenu();
@@ -243,6 +238,60 @@ public partial class ProductosPage : ContentPage
         menuVisible = !menuVisible;
     }
 
+    private async void OnPerfilClicked(object sender, EventArgs e)
+    {
+        await CloseMenu();
+        await Navigation.PushAsync(new MiPerfilPage());
+    }
+
+    private async Task AplicarPermisosUsuario()
+    {
+        var rol = await SecureStorage.GetAsync("usuario_rol");
+
+        bool esAdmin = rol?.ToLower() == "administrador";
+
+        // Ocultar botones si no es admin
+        BtnCrearProducto.IsVisible = esAdmin;
+        BtnImportar.IsVisible = esAdmin;
+        BtnAdmin.IsVisible = esAdmin;
+        BtnExportar.IsVisible = esAdmin;
+    }
+
+    private async void OnExportarClicked(object sender, EventArgs e)
+    {
+        try
+        {
+            var empresaId = int.Parse(await SecureStorage.GetAsync("empresa_id"));
+            var bytes = await _apiService.ExportarCSVAsync(empresaId);
+
+            if (bytes == null)
+            {
+                await DisplayAlert("Error", "No se pudo exportar el CSV", "OK");
+                return;
+            }
+
+            // Guardar archivo en caché
+            var filePath = Path.Combine(FileSystem.CacheDirectory, "productos.csv");
+            File.WriteAllBytes(filePath, bytes);
+
+            // Compartir archivo usando Share.RequestAsync
+            await Share.RequestAsync(new ShareFileRequest
+            {
+                Title = "Exportar productos",
+                File = new ShareFile(filePath)
+            });
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", ex.Message, "OK");
+        }
+    }
+
+    private async void OnEditarEmpresaClicked(object sender, EventArgs e)
+    {
+        await CloseMenu();
+        await Navigation.PushAsync(new EditarEmpresaPage(_apiService));
+    }
 
 
 }

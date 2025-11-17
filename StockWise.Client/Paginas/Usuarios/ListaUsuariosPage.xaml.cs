@@ -21,6 +21,7 @@ public partial class ListaUsuariosPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        await AplicarPermisosUsuario();
         await CargarUsuarios();
     }
 
@@ -119,5 +120,17 @@ public partial class ListaUsuariosPage : ContentPage
 
         await Shell.Current.GoToAsync("//productos");
     }
+
+    private async Task AplicarPermisosUsuario()
+    {
+        var rol = await SecureStorage.GetAsync("usuario_rol");
+
+        if (rol?.ToLower() != "administrador")
+        {
+            BtnCrearUsuario.IsVisible = false;
+            BtnProductos.IsVisible = false;
+        }
+    }
+
 
 }

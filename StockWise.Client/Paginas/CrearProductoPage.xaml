@@ -1,19 +1,53 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="StockWise.Client.Paginas.CrearProductoPage"
-             Title="Nuevo Producto">
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    x:Class="StockWise.Client.Paginas.CrearProductoPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Crear Producto"
+    BackgroundColor="#0A0F1C">
 
-    <VerticalStackLayout Padding="20">
+    <VerticalStackLayout Padding="20" Spacing="15">
 
-        <Entry x:Name="NombreEntry" Placeholder="Nombre" />
-        <Entry x:Name="ProveedorEntry" Placeholder="Proveedor" />
-        <Entry x:Name="CantidadEntry" Placeholder="Cantidad" Keyboard="Numeric"/>
-        <Entry x:Name="PrecioEntry" Placeholder="Precio" Keyboard="Numeric"/>
+        <!-- TÍTULO -->
+        <Label Text="Crear nuevo producto"
+               FontSize="22"
+               FontAttributes="Bold"
+               TextColor="#4EE1A0"
+               HorizontalOptions="Center" />
 
-        <Button Text="Guardar"
+        <!-- CAMPOS -->
+        <Entry x:Name="NombreEntry"
+               Placeholder="Nombre del producto"
+               TextColor="White"
+               PlaceholderColor="#7DA0C0"/>
+
+        <Entry x:Name="ProveedorEntry"
+               Placeholder="Proveedor"
+               TextColor="White"
+               PlaceholderColor="#7DA0C0"/>
+
+        <Entry x:Name="CantidadEntry"
+               Placeholder="Cantidad"
+               Keyboard="Numeric"
+               TextColor="White"
+               PlaceholderColor="#7DA0C0"/>
+
+        <Entry x:Name="PrecioEntry"
+               Placeholder="Precio (€)"
+               Keyboard="Numeric"
+               TextColor="White"
+               PlaceholderColor="#7DA0C0"/>
+
+        <!-- BOTÓN GUARDAR -->
+        <Button Text="Crear producto"
+                BackgroundColor="#4EE1A0"
+                TextColor="#0A0F1C"
+                CornerRadius="10"
+                FontAttributes="Bold"
+                HeightRequest="45"
                 Clicked="OnGuardarClicked"
-                BackgroundColor="#00C3FF"
-                TextColor="White"/>
+                Margin="0,15,0,0"/>
+
     </VerticalStackLayout>
+
 </ContentPage>

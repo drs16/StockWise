@@ -21,7 +21,7 @@ public partial class CrearProductoPage : ContentPage
             Proveedor = ProveedorEntry.Text,
             Cantidad = int.Parse(CantidadEntry.Text),
             Precio = decimal.Parse(PrecioEntry.Text),
-            EmpresaId = 1
+            EmpresaId = int.Parse(await SecureStorage.GetAsync("empresa_id"))
         };
 
         if (await _apiService.CrearProductoAsync(producto))
@@ -34,4 +34,5 @@ public partial class CrearProductoPage : ContentPage
             await DisplayAlert("Error", "No se pudo crear el producto", "OK");
         }
     }
+
 }

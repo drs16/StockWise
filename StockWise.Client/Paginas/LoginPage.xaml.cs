@@ -28,27 +28,59 @@ public partial class LoginPage : ContentPage
             return;
         }
 
-        // Guardar token
+        // Guardar token (siempre no nulo)
         await SecureStorage.SetAsync("jwt_token", token);
+
         _apiService.SetToken(token);
 
-        // 👉 EXTRAER EmpresaId DEL TOKEN
-        string empresaId = ObtenerClaim(token, "EmpresaId");
+        // Extraer claims de forma robusta
+        string GetClaim(string t, string claimTypeOrPartial)
+        {
+            if (string.IsNullOrEmpty(t)) return "";
+            try
+            {
+                var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+                var jwt = handler.ReadJwtToken(t);
+                // Primero buscar claim exacto (EmpresaId)
+                var exact = jwt.Claims.FirstOrDefault(c => c.Type == claimTypeOrPartial);
+                if (exact != null) return exact.Value;
+                // Luego buscar por sufijo/substring común (name, role)
+                var partial = jwt.Claims.FirstOrDefault(c => c.Type != null && c.Type.Contains(claimTypeOrPartial));
+                return partial?.Value ?? "";
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        var empresaId = GetClaim(token, "EmpresaId") ?? "";
+        var rol = GetClaim(token, "role");
+        var nombre = GetClaim(token, "name"); // puede venir como esquema completo
+                                              // nombre o email: si nombre vacío, usamos el email que ya conocemos
+        var usuarioNombre = string.IsNullOrEmpty(nombre) ? email : nombre;
+
+        // Guardar seguros (nunca pasar null)
+        await SecureStorage.SetAsync("empresa_id", empresaId ?? "");
+        await SecureStorage.SetAsync("usuario_rol", rol ?? "");
+        await SecureStorage.SetAsync("usuario_nombre", usuarioNombre ?? "");
+        await SecureStorage.SetAsync("usuario_email", email ?? "");
 
         if (string.IsNullOrEmpty(empresaId))
         {
-            await DisplayAlert("Error", "No se pudo obtener EmpresaId del token.", "OK");
-            return;
+            await DisplayAlert("Aviso", "EmpresaId no se encontró en el token. Comprueba el token o el servidor.", "OK");
+            // Puedes elegir fallar aquí o seguir navegando; yo solo aviso.
         }
-
-        // Guardar empresa_id
-        await SecureStorage.SetAsync("empresa_id", empresaId);
 
         await DisplayAlert("Éxito", "Inicio de sesión correcto", "OK");
 
-        // Navegar
-        await Shell.Current.GoToAsync("//productos");
+        // Navegar (ya guardamos rol)
+        if ((rol ?? "").ToLower() != "administrador")
+            await Shell.Current.GoToAsync("//productos");
+        else
+            await Shell.Current.GoToAsync("//productos");
     }
+
 
     public string ObtenerClaim(string token, string claimType)
     {

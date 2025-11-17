@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="StockWise.Client.Paginas.EditarEmpresaPage"
+    BackgroundColor="#0A0F1C"
+    Title="Editar Empresa">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="25" Spacing="18">
+
+            <!-- Título -->
+            <Label Text="Editar Empresa"
+                   FontSize="26"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="#4EE1A0"
+                   Margin="0,10"/>
+
+            <!-- Campo: Nombre -->
+            <Label Text="Nombre" TextColor="#4EE1A0"/>
+            <Entry x:Name="NombreEntry"
+                   Placeholder="Nombre de la empresa"
+                   BackgroundColor="#121A2A"
+                   TextColor="White"
+                   PlaceholderColor="#7DA0C0"
+                   CornerRadius="10"
+                   Padding="10"/>
+
+            <!-- Campo: NIF -->
+            <Label Text="NIF" TextColor="#4EE1A0"/>
+            <Entry x:Name="NifEntry"
+                   Placeholder="NIF"
+                   BackgroundColor="#121A2A"
+                   TextColor="White"
+                   PlaceholderColor="#7DA0C0"
+                   CornerRadius="10"
+                   Padding="10"/>
+
+            <!-- Campo: Dirección -->
+            <Label Text="Dirección" TextColor="#4EE1A0"/>
+            <Entry x:Name="DireccionEntry"
+                   Placeholder="Dirección completa"
+                   BackgroundColor="#121A2A"
+                   TextColor="White"
+                   PlaceholderColor="#7DA0C0"
+                   CornerRadius="10"
+                   Padding="10"/>
+
+            <!-- Campo: Email -->
+            <Label Text="Email" TextColor="#4EE1A0"/>
+            <Entry x:Name="EmailEntry"
+                   Placeholder="Correo de contacto"
+                   BackgroundColor="#121A2A"
+                   TextColor="White"
+                   PlaceholderColor="#7DA0C0"
+                   CornerRadius="10"
+                   Keyboard="Email"
+                   Padding="10"/>
+
+            <!-- Campo: Teléfono -->
+            <Label Text="Teléfono" TextColor="#4EE1A0"/>
+            <Entry x:Name="TelefonoEntry"
+                   Placeholder="Teléfono"
+                   BackgroundColor="#121A2A"
+                   TextColor="White"
+                   PlaceholderColor="#7DA0C0"
+                   CornerRadius="10"
+                   Keyboard="Telephone"
+                   Padding="10"/>
+
+            <!-- Botón guardar -->
+            <Button Text="💾 Guardar cambios"
+                    BackgroundColor="#4EE1A0"
+                    TextColor="#0A0F1C"
+                    FontAttributes="Bold"
+                    CornerRadius="12"
+                    HeightRequest="50"
+                    Margin="0,20,0,0"
+                    Clicked="OnGuardarClicked"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
