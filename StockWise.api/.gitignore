@@ -1,3 +1,4 @@
-﻿stockwise.db
-stockwise.db-shm
-stockwise.db-wal
+﻿# No subir la base de datos local
+StockWise.api/stockwise.db
+StockWise.api/stockwise.db-shm
+StockWise.api/stockwise.db-wal
