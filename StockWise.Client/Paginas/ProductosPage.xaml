@@ -51,7 +51,6 @@
              Padding="10"
              BackgroundColor="#121A2A"
              WidthRequest="200"
-             HeightRequest="auto"
              Opacity="0.92"
              IsVisible="False"
              HorizontalOptions="Start"

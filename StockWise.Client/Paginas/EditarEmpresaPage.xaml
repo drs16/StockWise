@@ -19,55 +19,85 @@
 
             <!-- Campo: Nombre -->
             <Label Text="Nombre" TextColor="#4EE1A0"/>
-            <Entry x:Name="NombreEntry"
-                   Placeholder="Nombre de la empresa"
-                   BackgroundColor="#121A2A"
-                   TextColor="White"
-                   PlaceholderColor="#7DA0C0"
-                   CornerRadius="10"
-                   Padding="10"/>
+
+            <Border Stroke="#121A2A"
+                    StrokeThickness="1"
+                    BackgroundColor="#121A2A"
+                    StrokeShape="RoundRectangle 10"
+                    Padding="10">
+                <Entry x:Name="NombreEntry"
+                       Placeholder="Nombre de la empresa"
+                       BackgroundColor="Transparent"
+                       TextColor="White"
+                       PlaceholderColor="#7DA0C0"/>
+            </Border>
+
 
             <!-- Campo: NIF -->
             <Label Text="NIF" TextColor="#4EE1A0"/>
-            <Entry x:Name="NifEntry"
-                   Placeholder="NIF"
-                   BackgroundColor="#121A2A"
-                   TextColor="White"
-                   PlaceholderColor="#7DA0C0"
-                   CornerRadius="10"
-                   Padding="10"/>
+
+            <Border Stroke="#121A2A"
+                    StrokeThickness="1"
+                    BackgroundColor="#121A2A"
+                    StrokeShape="RoundRectangle 10"
+                    Padding="10">
+                <Entry x:Name="NifEntry"
+                       Placeholder="NIF"
+                       BackgroundColor="Transparent"
+                       TextColor="White"
+                       PlaceholderColor="#7DA0C0"/>
+            </Border>
+
 
             <!-- Campo: Dirección -->
             <Label Text="Dirección" TextColor="#4EE1A0"/>
-            <Entry x:Name="DireccionEntry"
-                   Placeholder="Dirección completa"
-                   BackgroundColor="#121A2A"
-                   TextColor="White"
-                   PlaceholderColor="#7DA0C0"
-                   CornerRadius="10"
-                   Padding="10"/>
+
+            <Border Stroke="#121A2A"
+                    StrokeThickness="1"
+                    BackgroundColor="#121A2A"
+                    StrokeShape="RoundRectangle 10"
+                    Padding="10">
+                <Entry x:Name="DireccionEntry"
+                       Placeholder="Dirección completa"
+                       BackgroundColor="Transparent"
+                       TextColor="White"
+                       PlaceholderColor="#7DA0C0"/>
+            </Border>
+
 
             <!-- Campo: Email -->
             <Label Text="Email" TextColor="#4EE1A0"/>
-            <Entry x:Name="EmailEntry"
-                   Placeholder="Correo de contacto"
-                   BackgroundColor="#121A2A"
-                   TextColor="White"
-                   PlaceholderColor="#7DA0C0"
-                   CornerRadius="10"
-                   Keyboard="Email"
-                   Padding="10"/>
+
+            <Border Stroke="#121A2A"
+                    StrokeThickness="1"
+                    BackgroundColor="#121A2A"
+                    StrokeShape="RoundRectangle 10"
+                    Padding="10">
+                <Entry x:Name="EmailEntry"
+                       Placeholder="Correo de contacto"
+                       BackgroundColor="Transparent"
+                       TextColor="White"
+                       PlaceholderColor="#7DA0C0"
+                       Keyboard="Email"/>
+            </Border>
+
 
             <!-- Campo: Teléfono -->
             <Label Text="Teléfono" TextColor="#4EE1A0"/>
-            <Entry x:Name="TelefonoEntry"
-                   Placeholder="Teléfono"
-                   BackgroundColor="#121A2A"
-                   TextColor="White"
-                   PlaceholderColor="#7DA0C0"
-                   CornerRadius="10"
-                   Keyboard="Telephone"
-                   Padding="10"/>
+
+            <Border Stroke="#121A2A"
+                    StrokeThickness="1"
+                    BackgroundColor="#121A2A"
+                    StrokeShape="RoundRectangle 10"
+                    Padding="10">
+                <Entry x:Name="TelefonoEntry"
+                       Placeholder="Teléfono"
+                       BackgroundColor="Transparent"
+                       TextColor="White"
+                       PlaceholderColor="#7DA0C0"
+                       Keyboard="Telephone"/>
+            </Border>
+
 
             <!-- Botón guardar -->
             <Button Text="💾 Guardar cambios"
@@ -78,6 +108,7 @@
                     HeightRequest="50"
                     Margin="0,20,0,0"
                     Clicked="OnGuardarClicked"/>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
