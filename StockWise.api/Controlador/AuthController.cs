@@ -40,17 +40,18 @@ namespace StockWise.api.Controlador
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] Usuario login)
+        public async Task<IActionResult> Login([FromBody] LoginDto login)
         {
             var usuario = await _context.Usuarios
                 .FirstOrDefaultAsync(u => u.Email == login.Email);
 
-            if (usuario == null || !VerifyPassword(login.PasswordHash, usuario.PasswordHash))
+            if (usuario == null || !VerifyPassword(login.Password, usuario.PasswordHash))
                 return Unauthorized("Credenciales inválidas.");
 
             var token = _tokenService.GenerateToken(usuario);
             return Ok(new { token });
         }
+
 
 
         private string HashPassword(string password)

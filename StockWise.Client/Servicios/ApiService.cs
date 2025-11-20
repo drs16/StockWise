@@ -23,7 +23,7 @@ public class ApiService
     {
         _baseUrl = _useLocal
             ? "https://localhost:7013/api/"  // ✅ coincide con tu Swagger
-            : "https://stockwise-api-82wo.onrender.com/api";
+            : "https://stockwise-api-82wo.onrender.com/api/";
 
         _httpClient = new HttpClient
         {
@@ -51,7 +51,7 @@ public class ApiService
             var json = JsonSerializer.Serialize(new
             {
                 Email = email,
-                passwordHash = password
+                password  = password
             });
 
             Console.WriteLine($"[CLIENT-LOGIN] JSON a enviar: {json}");

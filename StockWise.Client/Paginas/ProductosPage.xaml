@@ -226,7 +226,7 @@
                 HeightRequest="48"
                 CornerRadius="18"
                 Margin="20,0,20,20"
-                Clicked="OnScanearClicked"/>
+                Clicked="AbrirLectorQR"/>
 
     </Grid>
 </ContentPage>
