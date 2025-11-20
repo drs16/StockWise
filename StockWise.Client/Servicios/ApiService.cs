@@ -15,7 +15,7 @@ public class ApiService
     // 🟢 Cambia este valor según lo que quieras probar:
     // true → Usa API local (Swagger / Visual Studio)
     // false → Usa API en Render (producción)
-    private readonly bool _useLocal = true;
+    private readonly bool _useLocal = false;
 
     private readonly string _baseUrl;
 
