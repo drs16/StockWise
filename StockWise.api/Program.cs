@@ -77,7 +77,12 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
-
+// 🔥 Crear BD automáticamente en Render
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated();
+}
 app.UseAuthentication();
 
 // ✅ Habilitar Swagger también en producción
