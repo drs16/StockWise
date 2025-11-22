@@ -31,12 +31,15 @@ namespace StockWise.api.Controlador
             if (await _context.Usuarios.AnyAsync(u => u.Email == usuario.Email))
                 return BadRequest("El correo ya está registrado.");
 
-            usuario.PasswordHash = HashPassword(usuario.PasswordHash);
+            usuario.PasswordHash = HashPassword(usuario.Password);
+            usuario.Password = null; // limpiar texto plano
+
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
 
             return Ok("Usuario registrado correctamente.");
         }
+
 
         [HttpPost("login")]
         [AllowAnonymous]

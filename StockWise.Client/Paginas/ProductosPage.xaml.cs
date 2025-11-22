@@ -293,5 +293,11 @@ public partial class ProductosPage : ContentPage
         await Navigation.PushAsync(new EditarEmpresaPage(_apiService));
     }
 
+    private async void AbrirLectorQR(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new LectorQRPage());
+    }
+
+
 
 }
