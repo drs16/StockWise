@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-            
-xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.Maui.Controls"
-             x:Class="StockWise.Client.Paginas.LectorQRPage">
-    
-    <Grid>
-    <zxing:CameraBarcodeReaderView 
-            x:Name="CameraBarcodeReaderView"
-            IsDetecting="True"  
-            BarcodesDetected="CameraBarcodeReaderView_BarcodesDetected" />
+<ContentPage
+    x:Class="StockWise.Client.Paginas.LectorQRPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.Maui.Controls">
 
-    <Label Text="Apunta al código QR" 
-               HorizontalOptions="Center" 
-               VerticalOptions="Start" />
+    <Grid>
+        <!-- Cámara -->
+        <zxing:CameraBarcodeReaderView
+            x:Name="barcodeReader"
+            BarcodesDetected="barcodeReader_BarcodesDetected"
+            HorizontalOptions="FillAndExpand"
+            VerticalOptions="FillAndExpand" />
+
+        <!-- Botón externo encima -->
+        <Button
+            Text="Usar escáner externo"
+            Clicked="AbrirScannerExterno"
+            BackgroundColor="Black"
+            TextColor="White"
+            Opacity="0.8"
+            HorizontalOptions="Center"
+            VerticalOptions="End"
+            Margin="0,0,0,30" />
     </Grid>
+
 </ContentPage>

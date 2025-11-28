@@ -1,54 +1,119 @@
-﻿using ZXing.Net.Maui; // Asegúrate de tener este using para BarcodeDetectionEventArgs
+﻿#if ANDROID
+using Android.Content;
+#endif
 
-namespace StockWise.Client.Paginas;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Storage;
+using StockWise.Client.Services;
+using ZXing.Net.Maui;
+using CommunityToolkit.Mvvm.Messaging;
 
-public partial class LectorQRPage : ContentPage
+
+namespace StockWise.Client.Paginas
 {
-    public LectorQRPage()
+    public partial class LectorQRPage : ContentPage
     {
-        InitializeComponent();
-    }
+        private bool _isProcessing = false;
 
-    private void CameraBarcodeReaderView_BarcodesDetected(object sender, BarcodeDetectionEventArgs e)
-    {
-        // Usamos Dispatcher.Dispatch para asegurarnos de que el código de la UI
-        // (como DisplayAlert) se ejecute en el hilo principal.
-        Dispatcher.Dispatch(async () =>
+        public LectorQRPage()
         {
-            // Detenemos la detección inmediatamente para evitar que se sigan leyendo
-            // códigos mientras se muestra la alerta o se procesa el resultado.
-            if (CameraBarcodeReaderView.IsDetecting)
+            InitializeComponent();
+    WeakReferenceMessenger.Default.Register<QRDetectedMessage>(this, async (r, m) =>
+{
+    if (!_isProcessing)
+        await ProcesarQR(m.Value);
+});
+        }
+
+        // ESCANER INTERNO
+        private void barcodeReader_BarcodesDetected(object sender, BarcodeDetectionEventArgs e)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
-                CameraBarcodeReaderView.IsDetecting = false;
-            }
+                var result = e.Results?.FirstOrDefault();
+                if (result != null && !_isProcessing)
+                {
+                    await ProcesarQR(result.Value);
+                }
+            });
+        }
 
-            // e.Results es una colección, pero normalmente solo tomamos el primero
-            var barcode = e.Results?.FirstOrDefault();
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            // Aquí no hacemos nada ya
+        }
 
-            if (barcode != null)
+        // ESCÁNER EXTERNO
+        private async void AbrirScannerExterno(object sender, EventArgs e)
+        {
+#if ANDROID
+            try
             {
-                // El resultado que buscamos está en barcode.Value
-                string valorQR = barcode.Value;
+                var intent = new Intent("com.google.zxing.client.android.SCAN");
+                intent.PutExtra("SCAN_MODE", "QR_CODE_MODE");
 
-                // Muestra el resultado
-                await DisplayAlert("Código QR Escaneado", $"El contenido es: {valorQR}", "Aceptar");
-
-                // Opcional: Si quieres volver a la página anterior después de la alerta
-                await Shell.Current.GoToAsync("..");
+                Platform.CurrentActivity.StartActivityForResult(intent, 0);
             }
-            // Si el código fuera nulo por alguna razón, podríamos reactivar el escaneo
-            else
+            catch
             {
-                CameraBarcodeReaderView.IsDetecting = true;
+                await DisplayAlert("Aviso", "No hay apps de escaneo instaladas.", "OK");
             }
-        });
-    }
+#else
+            await DisplayAlert("Aviso", "Disponible solo en Android.", "OK");
+#endif
+        }
 
-    // Opcional: Implementa OnDisappearing para asegurar que la cámara se detenga cuando la página se cierra.
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        // Esto libera los recursos de la cámara cuando la página deja de estar visible
-        CameraBarcodeReaderView.IsDetecting = false;
+        // 🔥 AL VOLVER A LA APP DESPUÉS DEL ESCÁNER EXTERNO
+        protected override void OnNavigatedTo(NavigatedToEventArgs args)
+        {
+            base.OnNavigatedTo(args);
+
+            if (_isProcessing)
+                return;
+
+            var pending = Preferences.Get("LastExternalQR", null as string);
+
+            if (!string.IsNullOrWhiteSpace(pending))
+            {
+                Preferences.Remove("LastExternalQR");
+
+                _ = ProcesarQR(pending);
+            }
+        }
+
+        // PROCESAR QR PARA AMBOS METODOS
+        private async Task ProcesarQR(string qr)
+        {
+            if (_isProcessing)
+                return;
+
+            _isProcessing = true;
+
+            try
+            {
+                var api = new ApiService();
+                var producto = await api.GetProductoByQRAsync(qr);
+
+                if (producto == null)
+                {
+                    await DisplayAlert("Error", "Producto no encontrado", "OK");
+                    return;
+                }
+
+                await Shell.Current.GoToAsync(nameof(ModificarStockPage), true, new Dictionary<string, object>
+{
+    { "Producto", producto }
+});
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", ex.Message, "OK");
+            }
+            finally
+            {
+                _isProcessing = false;
+            }
+        }
     }
 }

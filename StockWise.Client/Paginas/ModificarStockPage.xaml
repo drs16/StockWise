@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    x:Class="StockWise.Client.Paginas.ModificarStockPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="#0A0F1C">
+
+    <ScrollView Padding="20">
+
+        <VerticalStackLayout Spacing="25">
+
+            <!-- TÍTULO -->
+            <Label 
+                Text="Modificar Stock"
+                HorizontalOptions="Center"
+                FontSize="26"
+                FontAttributes="Bold"
+                TextColor="#4EE1A0"/>
+
+            <!-- DATOS DEL PRODUCTO -->
+            <Frame BackgroundColor="#121A2A"
+                   Padding="20"
+                   CornerRadius="15"
+                   HasShadow="True">
+
+                <VerticalStackLayout Spacing="8">
+
+                    <Label x:Name="NombreLabel"
+                           Text="Nombre"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           TextColor="White"/>
+
+                    <Label x:Name="CodigoLabel"
+                           Text="Código"
+                           FontSize="16"
+                           TextColor="#7DA0C0"/>
+
+                    <Label Text="Stock actual:"
+                           FontSize="16"
+                           TextColor="#4EE1A0"
+                           FontAttributes="Bold"/>
+
+                    <Label x:Name="StockLabel"
+                           FontSize="18"
+                           TextColor="#4EE1A0"
+                           FontAttributes="Bold"/>
+                </VerticalStackLayout>
+
+            </Frame>
+
+            <!-- CAMBIO DE STOCK -->
+            <Frame BackgroundColor="#121A2A"
+       Padding="15"
+       CornerRadius="15"
+       HasShadow="True">
+
+                <VerticalStackLayout Spacing="15">
+
+                    <Label Text="Modificar cantidad"
+               TextColor="White"
+               FontSize="18"
+               FontAttributes="Bold"/>
+
+                    <!-- CAMPO CANTIDAD -->
+                    <Entry x:Name="CantidadEntry"
+               Placeholder="Cantidad"
+               Keyboard="Numeric"
+               BackgroundColor="#0A0F1C"
+               TextColor="White"
+               PlaceholderColor="#7DA0C0"
+               FontSize="24"
+               HorizontalTextAlignment="Center"/>
+
+                    <!-- 🔢 TECLADO NUMÉRICO -->
+                    <Grid RowDefinitions="Auto,Auto,Auto,Auto"
+              ColumnDefinitions="*,*,*"
+              ColumnSpacing="10"
+              RowSpacing="10">
+
+                        <!-- 1 -->
+                        <Button Grid.Row="0" Grid.Column="0" Text="1" Style="{StaticResource KeypadButton}" Clicked="KeypadClicked"/>
+                        <!-- 2 -->
+                        <Button Grid.Row="0" Grid.Column="1" Text="2" Style="{StaticResource KeypadButton}" Clicked="KeypadClicked"/>
+                        <!-- 3 -->
+                        <Button Grid.Row="0" Grid.Column="2" Text="3" Style="{StaticResource KeypadButton}" Clicked="KeypadClicked"/>
+
+                        <!-- 4 -->
+                        <Button Grid.Row="1" Grid.Column="0" Text="4" Style="{StaticResource KeypadButton}" Clicked="KeypadClicked"/>
+                        <!-- 5 -->
+                        <Button Grid.Row="1" Grid.Column="1" Text="5" Style="{StaticResource KeypadButton}" Clicked="KeypadClicked"/>
+                        <!-- 6 -->
+                        <Button Grid.Row="1" Grid.Column="2" Text="6" Style="{StaticResource KeypadButton}" Clicked="KeypadClicked"/>
+
+                        <!-- 7 -->
+                        <Button Grid.Row="2" Grid.Column="0" Text="7" Style="{StaticResource KeypadButton}" Clicked="KeypadClicked"/>
+                        <!-- 8 -->
+                        <Button Grid.Row="2" Grid.Column="1" Text="8" Style="{StaticResource KeypadButton}" Clicked="KeypadClicked"/>
+                        <!-- 9 -->
+                        <Button Grid.Row="2" Grid.Column="2" Text="9" Style="{StaticResource KeypadButton}" Clicked="KeypadClicked"/>
+
+                        <!-- BORRAR -->
+                        <Button Grid.Row="3" Grid.Column="0"
+                    Text="⌫"
+                    BackgroundColor="#c62828"
+                    TextColor="White"
+                    CornerRadius="12"
+                    Clicked="KeypadDelete"/>
+
+                        <!-- 0 -->
+                        <Button Grid.Row="3" Grid.Column="1"
+                    Text="0"
+                    Style="{StaticResource KeypadButton}"
+                    Clicked="KeypadClicked"/>
+
+                        <!-- LIMPIAR -->
+                        <Button Grid.Row="3" Grid.Column="2"
+                    Text="CLR"
+                    BackgroundColor="#c62828"
+                    TextColor="White"
+                    CornerRadius="12"
+                    Clicked="KeypadClear"/>
+                    </Grid>
+
+                    <!-- BOTÓN: AÑADIR -->
+                    <Button Text="Añadir"
+                Clicked="OnAddClicked"
+                BackgroundColor="#4EE1A0"
+                TextColor="#0A0F1C"
+                CornerRadius="12"
+                Padding="12,6"/>
+
+                    <!-- BOTÓN: RESTAR -->
+                    <Button Text="Restar"
+                Clicked="OnRemoveClicked"
+                BackgroundColor="#c62828"
+                TextColor="White"
+                CornerRadius="12"
+                Padding="12,6"/>
+
+                </VerticalStackLayout>
+
+            </Frame>
+
+
+            <!-- BOTÓN GUARDAR -->
+            <Button Text="💾 Guardar Cambios"
+                    BackgroundColor="#4EE1A0"
+                    TextColor="#0A0F1C"
+                    FontAttributes="Bold"
+                    HeightRequest="50"
+                    CornerRadius="18"
+                    Clicked="GuardarCambios"/>
+
+            <!-- BOTÓN CANCELAR -->
+            <Button Text="Cancelar"
+                    BackgroundColor="#c62828"
+                    TextColor="White"
+                    HeightRequest="46"
+                    CornerRadius="18"
+                    Clicked="Cancelar"/>
+
+        </VerticalStackLayout>
+
+    </ScrollView>
+
+</ContentPage>

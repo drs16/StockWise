@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
 namespace StockWise.Client.Services;
 
@@ -348,6 +349,82 @@ public class ApiService
 
         return response.IsSuccessStatusCode;
     }
+
+    public async Task<ProductoDto?> GetProductoByQRAsync(string qr)
+    {
+        if (string.IsNullOrWhiteSpace(qr))
+            return null;
+
+        // 🟢 1. Cargar token SI NO ESTÁ ASIGNADO
+        if (string.IsNullOrEmpty(_token))
+        {
+            var storedToken = await SecureStorage.GetAsync("jwt_token");
+
+            if (!string.IsNullOrEmpty(storedToken))
+            {
+                _token = storedToken;
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", storedToken);
+
+                Console.WriteLine("[CLIENT] Token cargado automáticamente en GetProductoByQRAsync.");
+            }
+            else
+            {
+                Console.WriteLine("[CLIENT] No hay token almacenado para cargar.");
+            }
+        }
+
+        // 🟢 2. Construir QR de forma segura
+        var safe = Uri.EscapeDataString(qr);
+
+        // 🟢 3. RUTA CORRECTA SEGÚN TU API
+        var resp = await _httpClient.GetAsync($"Productos/porQR/{safe}");
+
+        // 🔴 Si devuelve 401, 404 o error → NULL
+        if (!resp.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"[CLIENT] ERROR HTTP {resp.StatusCode} al buscar producto por QR.");
+            return null;
+        }
+
+        // 🟢 4. Convertir JSON → objeto
+        var producto = await resp.Content.ReadFromJsonAsync<ProductoDto?>(
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        );
+
+        return producto;
+    }
+
+
+
+    public async Task<bool> UpdateStockAsync(ProductoDto producto)
+    {
+        // 🟢 1. Cargar token SI NO ESTÁ ASIGNADO
+        if (string.IsNullOrEmpty(_token))
+        {
+            var storedToken = await SecureStorage.GetAsync("jwt_token");
+
+            if (!string.IsNullOrEmpty(storedToken))
+            {
+                _token = storedToken;
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", storedToken);
+
+                Console.WriteLine("[CLIENT] Token cargado automáticamente en UpdateStockAsync.");
+            }
+            else
+            {
+                Console.WriteLine("[CLIENT] No hay token almacenado para cargar.");
+            }
+        }
+        var response = await _httpClient.PutAsJsonAsync(
+            $"Productos/{producto.Id}",
+            producto
+        );
+
+        return response.IsSuccessStatusCode;
+    }
+
 
 
 

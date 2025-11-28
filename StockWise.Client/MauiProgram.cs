@@ -2,7 +2,6 @@
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using StockWise.Client.Services;
-using ZXing.Net.Maui;
 using ZXing.Net.Maui.Controls;
 
 namespace StockWise.Client;
