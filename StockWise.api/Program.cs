@@ -5,12 +5,16 @@ using Microsoft.OpenApi.Models;
 using StockWise.api.Servicios;
 using StockWise.Api.Data;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Conexión a SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=stockwise.db"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 // Servicios
 builder.Services.AddScoped<TokenService>();
@@ -81,8 +85,9 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
+    db.Database.Migrate();
 }
+
 app.UseAuthentication();
 
 // ✅ Habilitar Swagger también en producción
