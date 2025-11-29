@@ -11,6 +11,7 @@ using System.Text;
 
 namespace StockWise.api.Controlador
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase

@@ -4,11 +4,11 @@ namespace StockWise.Client.Paginas;
 
 public partial class CambiarPassword : ContentPage
 {
-    private readonly ApiService _apiService;
-    public CambiarPassword(ApiService apiService)
+    private readonly ApiService _apiService = new ApiService();
+
+    public CambiarPassword()
     {
         InitializeComponent();
-        _apiService = apiService;
     }
     private async void OnGuardarClicked(object sender, EventArgs e)
     {

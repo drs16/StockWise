@@ -456,8 +456,11 @@ public class ApiService
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         var url = "Usuarios/cambiarPassword";
-        Console.WriteLine("[CP] POST " + _httpClient.BaseAddress + url);
-        Console.WriteLine("[CP] JSON: " + json);
+
+        Console.WriteLine("==== CAMBIAR PASSWORD DEBUG ====");
+        Console.WriteLine("Token actual: " + token);
+        Console.WriteLine("URL: " + _httpClient.BaseAddress + url);
+        Console.WriteLine("JSON enviado: " + json);
 
         var response = await _httpClient.PostAsync(url, content);
 
@@ -467,6 +470,7 @@ public class ApiService
 
         return response.IsSuccessStatusCode;
     }
+
 
 
 
