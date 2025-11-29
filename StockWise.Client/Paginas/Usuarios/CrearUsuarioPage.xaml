@@ -26,14 +26,14 @@
                IsPassword="True"/>
 
         <Picker x:Name="RolPicker"
-                Title="Seleccionar rol"
-                TitleColor="#7DA0C0"
-                TextColor="White">
+        Title="Seleccionar rol"
+        TitleColor="#7DA0C0"
+        TextColor="White">
             <Picker.Items>
-                <x:String>Administrador</x:String>
                 <x:String>Empleado</x:String>
             </Picker.Items>
         </Picker>
+
 
         <Button Text="Crear usuario"
                 BackgroundColor="#4EE1A0"

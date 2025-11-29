@@ -167,6 +167,9 @@ public class ApiService
     {
         try
         {
+            Console.WriteLine("[CLIENT] GET productos con token:");
+            Console.WriteLine(_token);
+
             Console.WriteLine("[CLIENT-PRODUCTOS] Solicitando lista de productos por empresa...");
 
             // Recuperar empresa del usuario logueado
@@ -250,8 +253,7 @@ public class ApiService
             })!;
     }
 
-
-    public async Task<bool> CrearUsuarioAsync(UsuarioDto usuario)
+    public async Task<bool> CrearUsuarioAsync(CrearUsuarioDto usuario)
     {
         var token = await SecureStorage.GetAsync("jwt_token");
 
@@ -268,6 +270,7 @@ public class ApiService
 
         return response.IsSuccessStatusCode;
     }
+
 
 
 

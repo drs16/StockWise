@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11222.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockWise.Client", "StockWise.Client\StockWise.Client.csproj", "{3F2D678B-BAAE-4A42-B60C-20E8F3BABDC8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockWise.api", "StockWise.api\StockWise.api.csproj", "{ADF3EDCF-FD6B-48D6-9DF9-7E27DF7B3911}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elementos de la solución", "Elementos de la solución", "{D4E711BC-FA29-46F1-A5C0-0AFB4EE8CBA7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,6 +21,7 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{3F2D678B-BAAE-4A42-B60C-20E8F3BABDC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3F2D678B-BAAE-4A42-B60C-20E8F3BABDC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F2D678B-BAAE-4A42-B60C-20E8F3BABDC8}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{3F2D678B-BAAE-4A42-B60C-20E8F3BABDC8}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{3F2D678B-BAAE-4A42-B60C-20E8F3BABDC8}.Debug|x64.Build.0 = Debug|Any CPU
 		{3F2D678B-BAAE-4A42-B60C-20E8F3BABDC8}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -44,5 +47,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F6B94C68-E77A-451B-ABB5-660F70AACA7E}
 	EndGlobalSection
 EndGlobal

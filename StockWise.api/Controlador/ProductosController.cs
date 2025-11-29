@@ -85,20 +85,44 @@ namespace StockWise.api.Controlador
             if (productos == null || !productos.Any())
                 return BadRequest("No se recibieron productos para importar.");
 
-            // Validar y generar códigos QR faltantes
-            foreach (var producto in productos)
+            int empresaId = productos.First().EmpresaId;
+
+            // Obtener productos existentes de esa empresa
+            var existentes = await _context.Productos
+                .Where(p => p.EmpresaId == empresaId)
+                .ToListAsync();
+
+            var nuevos = new List<Producto>();
+
+            foreach (var p in productos)
             {
-                if (string.IsNullOrWhiteSpace(producto.CodigoQR))
-                {
-                    producto.CodigoQR = $"{producto.Nombre[..Math.Min(4, producto.Nombre.Length)].ToUpper()}-{Guid.NewGuid().ToString()[..6]}";
-                }
+                // GENERAR QR si falta
+                if (string.IsNullOrWhiteSpace(p.CodigoQR))
+                    p.CodigoQR = $"{p.Nombre[..Math.Min(4, p.Nombre.Length)].ToUpper()}-{Guid.NewGuid().ToString()[..6]}";
+
+                // COMPROBAR DUPLICADO POR QR
+                if (existentes.Any(e => e.CodigoQR == p.CodigoQR))
+                    continue; // ❌ ignorar este producto
+
+                // OPCIONAL: comprobar por nombre + proveedor
+                if (existentes.Any(e => e.Nombre == p.Nombre && e.Proveedor == p.Proveedor))
+                    continue;
+
+                nuevos.Add(p);
             }
 
-            await _context.Productos.AddRangeAsync(productos);
+            if (!nuevos.Any())
+                return BadRequest("Todos los productos estaban duplicados.");
+
+            await _context.Productos.AddRangeAsync(nuevos);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = $"{productos.Count} productos importados correctamente." });
+            return Ok(new
+            {
+                message = $"{nuevos.Count} productos importados. {productos.Count - nuevos.Count} duplicados ignorados."
+            });
         }
+
 
         [HttpPost]
         [Authorize(Roles = "Administrador")]

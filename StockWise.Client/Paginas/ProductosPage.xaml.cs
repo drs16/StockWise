@@ -30,6 +30,7 @@ public partial class ProductosPage : ContentPage
         try
         {
             var token = await SecureStorage.GetAsync("jwt_token");
+
             if (!string.IsNullOrEmpty(token))
                 _apiService.SetToken(token);
 

@@ -33,6 +33,7 @@ public partial class LoginPage : ContentPage
 
         _apiService.SetToken(token);
 
+
         // Extraer claims de forma robusta
         string GetClaim(string t, string claimTypeOrPartial)
         {

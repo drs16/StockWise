@@ -6,7 +6,6 @@ namespace StockWise.Client.Paginas.Usuarios;
 public partial class CrearUsuarioPage : ContentPage
 {
     private readonly ApiService _apiService;
-    private int empresaId;
 
     public CrearUsuarioPage(ApiService apiService)
     {
@@ -14,31 +13,21 @@ public partial class CrearUsuarioPage : ContentPage
         _apiService = apiService;
     }
 
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
-
-        empresaId = int.Parse(await SecureStorage.GetAsync("empresa_id"));
-    }
-
     private async void OnCrearClicked(object sender, EventArgs e)
     {
         if (string.IsNullOrWhiteSpace(NombreEntry.Text) ||
             string.IsNullOrWhiteSpace(EmailEntry.Text) ||
-            string.IsNullOrWhiteSpace(PasswordEntry.Text) ||
-            RolPicker.SelectedItem == null)
+            string.IsNullOrWhiteSpace(PasswordEntry.Text))
         {
             await DisplayAlert("Error", "Por favor completa todos los campos.", "OK");
             return;
         }
 
-        var usuario = new UsuarioDto
+        var usuario = new CrearUsuarioDto
         {
             NombreUsuario = NombreEntry.Text.Trim(),
             Email = EmailEntry.Text.Trim(),
-            PasswordHash = PasswordEntry.Text.Trim(),  // 🔥 SE MANDA LA CONTRASEÑA NORMAL
-            Rol = RolPicker.SelectedItem.ToString(),
-            EmpresaId = empresaId
+            Password = PasswordEntry.Text.Trim()
         };
 
         var ok = await _apiService.CrearUsuarioAsync(usuario);
@@ -46,7 +35,7 @@ public partial class CrearUsuarioPage : ContentPage
         if (ok)
         {
             await DisplayAlert("Éxito", "Usuario creado correctamente.", "OK");
-            await Navigation.PopAsync(); // volver a lista
+            await Navigation.PopAsync();
         }
         else
         {
