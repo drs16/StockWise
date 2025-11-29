@@ -10,7 +10,9 @@ using System.Text.RegularExpressions;
 
 namespace StockWise.api.Controlador
 {
-    [Authorize(Roles = "Administrador")]
+    // 👇 Ahora cualquiera autenticado puede entrar al controlador,
+    // pero SOLO los métodos marcados requieren rol Administrador
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsuariosController : ControllerBase
@@ -31,7 +33,21 @@ namespace StockWise.api.Controlador
             return int.Parse(claim);
         }
 
-        // GET: api/Usuarios
+        // 📌 Obtener UsuarioId desde el token
+        private int ObtenerUsuarioId()
+        {
+            var claim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(claim))
+                throw new Exception("No se pudo obtener UsuarioId del token.");
+            return int.Parse(claim);
+        }
+
+        // ======================================================
+        // 📌 MÉTODOS SOLO PARA ADMINISTRADOR
+        // ======================================================
+
+        // Obtener todos los usuarios de la empresa
+        [Authorize(Roles = "Administrador")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Usuario>>> GetUsuarios()
         {
@@ -42,7 +58,8 @@ namespace StockWise.api.Controlador
                 .ToListAsync();
         }
 
-        // GET: api/Usuarios/5
+        // Obtener un usuario por Id
+        [Authorize(Roles = "Administrador")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Usuario>> GetUsuario(int id)
         {
@@ -57,7 +74,8 @@ namespace StockWise.api.Controlador
             return usuario;
         }
 
-        // POST: api/Usuarios
+        // Crear un usuario
+        [Authorize(Roles = "Administrador")]
         [HttpPost]
         public async Task<ActionResult<Usuario>> PostUsuario(CrearUsuarioDto dto)
         {
@@ -71,7 +89,7 @@ namespace StockWise.api.Controlador
 
             // Validar contraseña segura
             if (!Regex.IsMatch(dto.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*_\-]).{8,}$"))
-                return BadRequest("La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.");
+                return BadRequest("La contraseña debe tener mínimo 8 caracteres, mayúscula, minúscula, número y símbolo.");
 
             int empresaId = ObtenerEmpresaId();
 
@@ -83,10 +101,10 @@ namespace StockWise.api.Controlador
                 Rol = "Empleado"
             };
 
-            // Hash contraseña
-            using var sha = System.Security.Cryptography.SHA256.Create();
-            var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(dto.Password));
-            usuario.PasswordHash = Convert.ToBase64String(bytes);
+            using var sha = SHA256.Create();
+            usuario.PasswordHash = Convert.ToBase64String(
+                sha.ComputeHash(Encoding.UTF8.GetBytes(dto.Password))
+            );
 
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
@@ -94,7 +112,8 @@ namespace StockWise.api.Controlador
             return CreatedAtAction(nameof(GetUsuario), new { id = usuario.Id }, usuario);
         }
 
-        // PUT: api/Usuarios/5
+        // Editar usuario
+        [Authorize(Roles = "Administrador")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUsuario(int id, EditarUsuarioDto dto)
         {
@@ -106,32 +125,25 @@ namespace StockWise.api.Controlador
             if (usuario == null)
                 return NotFound();
 
-            // Actualizar nombre
             usuario.NombreUsuario = dto.NombreUsuario;
 
-            // Validar email si cambia
             if (usuario.Email != dto.Email)
             {
                 if (!Regex.IsMatch(dto.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
                     return BadRequest("Email no válido.");
 
                 if (await _context.Usuarios.AnyAsync(u => u.Email == dto.Email && u.Id != id))
-                    return BadRequest("El email ya está en uso.");
+                    return BadRequest("Email ya registrado.");
 
                 usuario.Email = dto.Email;
             }
 
-
-
-            usuario.Rol = "Empleado"; // Nunca se cambia por API
-
             await _context.SaveChangesAsync();
-
             return NoContent();
         }
 
-
-        // DELETE: api/Usuarios/5
+        // Eliminar usuario
+        [Authorize(Roles = "Administrador")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUsuario(int id)
         {
@@ -149,8 +161,9 @@ namespace StockWise.api.Controlador
             return NoContent();
         }
 
-        [HttpPost("{id}/reset-password")]
+        // Reset password (admin)
         [Authorize(Roles = "Administrador")]
+        [HttpPost("{id}/reset-password")]
         public async Task<IActionResult> ResetPassword(int id)
         {
             var usuario = await _context.Usuarios.FindAsync(id);
@@ -158,47 +171,26 @@ namespace StockWise.api.Controlador
             if (usuario == null)
                 return NotFound();
 
-            // Generar contraseña temporal
             string tempPass = Guid.NewGuid().ToString().Substring(0, 8);
 
-            using var sha = System.Security.Cryptography.SHA256.Create();
+            using var sha = SHA256.Create();
             usuario.PasswordHash = Convert.ToBase64String(
                 sha.ComputeHash(Encoding.UTF8.GetBytes(tempPass))
             );
 
-            usuario.DebeCambiarPassword = true; // si quieres obligarlo a cambiarla luego
+            usuario.DebeCambiarPassword = true;
 
             await _context.SaveChangesAsync();
 
             return Ok(new { tempPassword = tempPass });
         }
 
-        [HttpPost("resetPassword/{id}")]
-        [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> ResetearPassword(int id)
-        {
-            var usuario = await _context.Usuarios.FindAsync(id);
+        // ======================================================
+        // 📌 MÉTODOS PARA CUALQUIER USUARIO AUTENTICADO
+        // ======================================================
 
-            if (usuario == null)
-                return NotFound("Usuario no encontrado.");
-
-            // Nueva contraseña temporal
-            string tempPassword = "Tmp#" + new Random().Next(1000, 9999);
-
-            // Hash
-            using var sha = System.Security.Cryptography.SHA256.Create();
-            var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(tempPassword));
-            usuario.PasswordHash = Convert.ToBase64String(bytes);
-
-            // Marcar para cambio obligatorio
-            usuario.DebeCambiarPassword = true;
-
-            await _context.SaveChangesAsync();
-
-            return Ok(new { temporal = tempPassword });
-        }
-
-        [Authorize] 
+        // Cambiar su propia contraseña
+        [Authorize] // cualquier usuario logueado
         [HttpPost("cambiarPassword")]
         public async Task<IActionResult> CambiarPassword(CambiarPasswordDto dto)
         {
@@ -211,6 +203,7 @@ namespace StockWise.api.Controlador
             if (usuario == null)
                 return Unauthorized();
 
+            // Hash de la nueva contraseña
             using var sha = SHA256.Create();
             var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(dto.NuevaPassword));
             usuario.PasswordHash = Convert.ToBase64String(bytes);
@@ -221,18 +214,5 @@ namespace StockWise.api.Controlador
 
             return NoContent();
         }
-
-        private int ObtenerUsuarioId()
-        {
-            var claim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(claim))
-                throw new Exception("No se pudo obtener UsuarioId del token.");
-
-            return int.Parse(claim);
-        }
-
-
-
     }
 }
