@@ -24,7 +24,6 @@ namespace StockWise.api.Servicios
                 new Claim(ClaimTypes.Role, usuario.Rol),
                 new Claim("EmpresaId", usuario.EmpresaId.ToString()),
                 new Claim("DebeCambiarPassword", usuario.DebeCambiarPassword.ToString()),
-                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString())
 
             };
 
