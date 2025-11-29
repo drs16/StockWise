@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StockWise.api.Modelo;
 using StockWise.Api.Data;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -196,6 +197,7 @@ namespace StockWise.api.Controlador
             return Ok(new { temporal = tempPassword });
         }
 
+        [Authorize] 
         [HttpPost("cambiarPassword")]
         public async Task<IActionResult> CambiarPassword(CambiarPasswordDto dto)
         {
@@ -208,7 +210,7 @@ namespace StockWise.api.Controlador
             if (usuario == null)
                 return Unauthorized();
 
-            using var sha = System.Security.Cryptography.SHA256.Create();
+            using var sha = SHA256.Create();
             var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(dto.NuevaPassword));
             usuario.PasswordHash = Convert.ToBase64String(bytes);
 
