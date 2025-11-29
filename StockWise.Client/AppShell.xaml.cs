@@ -8,6 +8,7 @@ public partial class AppShell : Shell
     {
         InitializeComponent();
         Routing.RegisterRoute(nameof(ModificarStockPage), typeof(ModificarStockPage));
+        Routing.RegisterRoute("CambiarPassword", typeof(CambiarPassword));
 
     }
 }

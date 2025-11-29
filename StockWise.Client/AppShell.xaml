@@ -14,4 +14,8 @@
         Route="productos"
         ContentTemplate="{DataTemplate paginas:ProductosPage}" />
 
+    <ShellContent
+        Route="CambiarPassword"
+        ContentTemplate="{DataTemplate paginas:CambiarPassword}" />
+
 </Shell>

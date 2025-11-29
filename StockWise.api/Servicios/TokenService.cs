@@ -21,7 +21,8 @@ namespace StockWise.api.Servicios
             {
                 new Claim(ClaimTypes.Name, usuario.NombreUsuario),
                 new Claim(ClaimTypes.Role, usuario.Rol),
-                new Claim("EmpresaId", usuario.EmpresaId.ToString())
+                new Claim("EmpresaId", usuario.EmpresaId.ToString()),
+                new Claim("DebeCambiarPassword", usuario.DebeCambiarPassword.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));

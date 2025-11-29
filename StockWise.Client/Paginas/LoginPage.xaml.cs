@@ -60,7 +60,8 @@ public partial class LoginPage : ContentPage
         var nombre = GetClaim(token, "name"); // puede venir como esquema completo
                                               // nombre o email: si nombre vacío, usamos el email que ya conocemos
         var usuarioNombre = string.IsNullOrEmpty(nombre) ? email : nombre;
-
+        var debeCambiar = GetClaim(token, "DebeCambiarPassword") ?? "false";
+        await SecureStorage.SetAsync("debe_cambiar", debeCambiar);
         // Guardar seguros (nunca pasar null)
         await SecureStorage.SetAsync("empresa_id", empresaId ?? "");
         await SecureStorage.SetAsync("usuario_rol", rol ?? "");
@@ -74,6 +75,16 @@ public partial class LoginPage : ContentPage
         }
 
         await DisplayAlert("Éxito", "Inicio de sesión correcto", "OK");
+
+        var flag = await SecureStorage.GetAsync("debe_cambiar");
+
+        if (flag == "True")
+        {
+            await DisplayAlert("Aviso", "Debes cambiar tu contraseña antes de continuar.", "OK");
+            await Shell.Current.GoToAsync("//CambiarPassword");
+            return;
+        }
+
 
         // Navegar (ya guardamos rol)
         if ((rol ?? "").ToLower() != "administrador")
