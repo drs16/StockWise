@@ -446,16 +446,24 @@ public class ApiService
         return doc.RootElement.GetProperty("temporal").GetString();
     }
 
-    public async Task<bool> CambiarMiPassword(string nuevaPassword)
+    public async Task<bool> CambiarMiPassword(string nueva)
     {
         var token = await SecureStorage.GetAsync("jwt_token");
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
 
-        var json = JsonSerializer.Serialize(new { NuevaPassword = nuevaPassword });
+        var json = JsonSerializer.Serialize(new { NuevaPassword = nueva });
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var response = await _httpClient.PostAsync("Usuarios/cambiarPassword", content);
+        var url = "Usuarios/cambiarPassword";
+        Console.WriteLine("[CP] POST " + _httpClient.BaseAddress + url);
+        Console.WriteLine("[CP] JSON: " + json);
+
+        var response = await _httpClient.PostAsync(url, content);
+
+        var body = await response.Content.ReadAsStringAsync();
+        Console.WriteLine("[CP] Status: " + response.StatusCode);
+        Console.WriteLine("[CP] Body: " + body);
 
         return response.IsSuccessStatusCode;
     }

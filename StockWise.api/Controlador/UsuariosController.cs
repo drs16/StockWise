@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StockWise.api.Modelo;
 using StockWise.Api.Data;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -223,13 +224,14 @@ namespace StockWise.api.Controlador
 
         private int ObtenerUsuarioId()
         {
-            var claim = User.Claims.FirstOrDefault(c => c.Type.Contains("nameidentifier"))?.Value;
+            var claim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrEmpty(claim))
                 throw new Exception("No se pudo obtener UsuarioId del token.");
 
             return int.Parse(claim);
         }
+
 
 
     }
