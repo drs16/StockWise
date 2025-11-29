@@ -14,7 +14,11 @@ public class Usuario
     [NotMapped]
     public string Password { get; set; } = string.Empty;
 
+
     public string Rol { get; set; } = "Empleado";
+
+    public bool DebeCambiarPassword { get; set; } = false;
+
     public int EmpresaId { get; set; }
     public Empresa? Empresa { get; set; }
 }

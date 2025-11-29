@@ -132,5 +132,30 @@ public partial class ListaUsuariosPage : ContentPage
         }
     }
 
+    private async void OnResetPasswordClicked(object sender, EventArgs e)
+    {
+        if ((sender as Button)?.BindingContext is not UsuarioDto usuario)
+            return;
+
+        bool confirmar = await DisplayAlert(
+            "Resetear contraseña",
+            $"¿Deseas resetear la contraseña de {usuario.NombreUsuario}?",
+            "Sí", "No");
+
+        if (!confirmar) return;
+
+        var nueva = await _apiService.ResetearPassword(usuario.Id);
+
+        if (nueva == null)
+        {
+            await DisplayAlert("Error", "No se pudo resetear la contraseña.", "OK");
+        }
+        else
+        {
+            await DisplayAlert("Contraseña reseteada",
+                $"Nueva contraseña temporal:\n\n{nueva}\n\nEl usuario deberá cambiarla al iniciar sesión.",
+                "OK");
+        }
+    }
 
 }

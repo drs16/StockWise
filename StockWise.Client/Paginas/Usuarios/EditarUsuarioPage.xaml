@@ -21,12 +21,6 @@
                PlaceholderColor="#7DA0C0"
                Keyboard="Email"/>
 
-        <Entry x:Name="PasswordEntry"
-               Placeholder="Nueva contraseña (opcional)"
-               TextColor="White"
-               PlaceholderColor="#7DA0C0"
-               IsPassword="True"/>
-        
         <Picker x:Name="RolPicker"
         SelectedItem="{Binding Rol}">
             <Picker.Items>

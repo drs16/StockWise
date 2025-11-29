@@ -89,6 +89,9 @@
 	  <Compile Update="Paginas\MiPerfilPage.xaml.cs">
 	    <DependentUpon>MiPerfilPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Paginas\CambiarPasswordPage.xaml.cs">
+	    <DependentUpon>CambiarPasswordPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Paginas\ProductoDetallePage.xaml.cs">
 	    <DependentUpon>ProductoDetallePage.xaml</DependentUpon>
 	  </Compile>
@@ -117,6 +120,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Paginas\MiPerfilPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Paginas\CambiarPasswordPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Paginas\ProductoDetallePage.xaml">

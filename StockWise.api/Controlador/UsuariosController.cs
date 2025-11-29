@@ -119,16 +119,7 @@ namespace StockWise.api.Controlador
                 usuario.Email = dto.Email;
             }
 
-            // Si se envía nueva contraseña
-            if (!string.IsNullOrWhiteSpace(dto.Password))
-            {
-                if (!Regex.IsMatch(dto.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*_\-]).{8,}$"))
-                    return BadRequest("La contraseña no cumple los requisitos de seguridad.");
 
-                using var sha = System.Security.Cryptography.SHA256.Create();
-                var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(dto.Password));
-                usuario.PasswordHash = Convert.ToBase64String(bytes);
-            }
 
             usuario.Rol = "Empleado"; // Nunca se cambia por API
 
@@ -155,5 +146,89 @@ namespace StockWise.api.Controlador
 
             return NoContent();
         }
+
+        [HttpPost("{id}/reset-password")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> ResetPassword(int id)
+        {
+            var usuario = await _context.Usuarios.FindAsync(id);
+
+            if (usuario == null)
+                return NotFound();
+
+            // Generar contraseña temporal
+            string tempPass = Guid.NewGuid().ToString().Substring(0, 8);
+
+            using var sha = System.Security.Cryptography.SHA256.Create();
+            usuario.PasswordHash = Convert.ToBase64String(
+                sha.ComputeHash(Encoding.UTF8.GetBytes(tempPass))
+            );
+
+            usuario.DebeCambiarPassword = true; // si quieres obligarlo a cambiarla luego
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { tempPassword = tempPass });
+        }
+
+        [HttpPost("resetPassword/{id}")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> ResetearPassword(int id)
+        {
+            var usuario = await _context.Usuarios.FindAsync(id);
+
+            if (usuario == null)
+                return NotFound("Usuario no encontrado.");
+
+            // Nueva contraseña temporal
+            string tempPassword = "Tmp#" + new Random().Next(1000, 9999);
+
+            // Hash
+            using var sha = System.Security.Cryptography.SHA256.Create();
+            var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(tempPassword));
+            usuario.PasswordHash = Convert.ToBase64String(bytes);
+
+            // Marcar para cambio obligatorio
+            usuario.DebeCambiarPassword = true;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { temporal = tempPassword });
+        }
+
+        [HttpPost("cambiarPassword")]
+        public async Task<IActionResult> CambiarPassword(CambiarPasswordDto dto)
+        {
+            int empresaId = ObtenerEmpresaId();
+            int usuarioId = ObtenerUsuarioId();
+
+            var usuario = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.Id == usuarioId && u.EmpresaId == empresaId);
+
+            if (usuario == null)
+                return Unauthorized();
+
+            using var sha = System.Security.Cryptography.SHA256.Create();
+            var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(dto.NuevaPassword));
+            usuario.PasswordHash = Convert.ToBase64String(bytes);
+
+            usuario.DebeCambiarPassword = false;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private int ObtenerUsuarioId()
+        {
+            var claim = User.Claims.FirstOrDefault(c => c.Type.Contains("nameidentifier"))?.Value;
+
+            if (string.IsNullOrEmpty(claim))
+                throw new Exception("No se pudo obtener UsuarioId del token.");
+
+            return int.Parse(claim);
+        }
+
+
     }
 }

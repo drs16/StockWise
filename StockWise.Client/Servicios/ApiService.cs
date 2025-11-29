@@ -428,6 +428,37 @@ public class ApiService
         return response.IsSuccessStatusCode;
     }
 
+    public async Task<string?> ResetearPassword(int usuarioId)
+    {
+        var token = await SecureStorage.GetAsync("jwt_token");
+
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
+
+        var resp = await _httpClient.PostAsync($"Usuarios/resetPassword/{usuarioId}", null);
+
+        if (!resp.IsSuccessStatusCode)
+            return null;
+
+        var json = await resp.Content.ReadAsStringAsync();
+
+        using var doc = JsonDocument.Parse(json);
+        return doc.RootElement.GetProperty("temporal").GetString();
+    }
+
+    public async Task<bool> CambiarMiPassword(string nuevaPassword)
+    {
+        var token = await SecureStorage.GetAsync("jwt_token");
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
+
+        var json = JsonSerializer.Serialize(new { NuevaPassword = nuevaPassword });
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await _httpClient.PostAsync("Usuarios/cambiarPassword", content);
+
+        return response.IsSuccessStatusCode;
+    }
 
 
 

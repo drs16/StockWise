@@ -25,13 +25,6 @@ public partial class EditarUsuarioPage : ContentPage
     {
         usuario.NombreUsuario = NombreEntry.Text.Trim();
         usuario.Email = EmailEntry.Text.Trim();
-        usuario.Rol = RolPicker.SelectedItem.ToString();
-
-        // ⚠ Contraseña solo si la cambian
-        if (!string.IsNullOrWhiteSpace(PasswordEntry.Text))
-        {
-            usuario.PasswordHash = PasswordEntry.Text.Trim();
-        }
 
         var ok = await _apiService.ActualizarUsuarioAsync(usuario);
 
