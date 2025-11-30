@@ -34,6 +34,8 @@ public class ApiService
         Console.WriteLine($"[CLIENT-INIT] Base URL configurada: {_baseUrl}");
     }
 
+    public HttpClient HttpClient => _httpClient;
+
     public void SetToken(string token)
     {
         _token = token;

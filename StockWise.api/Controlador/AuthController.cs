@@ -75,6 +75,10 @@ namespace StockWise.api.Controlador
         [HttpPost("registroInicial")]
         public async Task<ActionResult> RegistroInicial(RegistroInicialDto dto)
         {
+            // 🛑 Validar NIF único
+            if (await _context.Empresas.AnyAsync(e => e.NIF == dto.NIF))
+                return BadRequest("Ya existe una empresa registrada con ese NIF.");
+
             // 1️⃣ Crear empresa
             var empresa = new Empresa
             {
@@ -84,6 +88,7 @@ namespace StockWise.api.Controlador
                 Email = dto.EmailEmpresa,
                 Telefono = dto.TelefonoEmpresa
             };
+
 
             _context.Empresas.Add(empresa);
             await _context.SaveChangesAsync(); // aquí empresa.Id ya tiene valor

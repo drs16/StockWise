@@ -90,6 +90,7 @@ namespace StockWise.Client.Paginas
 
             _isProcessing = true;
 
+
             try
             {
                 var api = new ApiService();

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:StockWise.Client.ViewModels"
+             x:Class="StockWise.Client.Paginas.RegistroInicialPage">
+
+    <ContentPage.BindingContext>
+        <vm:RegistroInicialViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <Label Text="Registro Inicial"
+                   HorizontalOptions="Center"
+                   FontSize="28"
+                   FontAttributes="Bold"/>
+
+            <Label Text="Datos de la empresa" FontAttributes="Bold" />
+
+            <Entry Placeholder="Nombre de la empresa" Text="{Binding NombreEmpresa}" />
+            <Entry Placeholder="NIF" Text="{Binding Nif}" />
+            <Entry Placeholder="Dirección" Text="{Binding Direccion}" />
+            <Entry Placeholder="Email empresa" Text="{Binding EmailEmpresa}" Keyboard="Email" />
+            <Entry Placeholder="Teléfono" Text="{Binding TelefonoEmpresa}" Keyboard="Telephone" />
+
+            <Label Text="Administrador" FontAttributes="Bold" />
+
+            <Entry Placeholder="Nombre administrador" Text="{Binding AdminNombre}" />
+            <Entry Placeholder="Email administrador" Text="{Binding AdminEmail}" Keyboard="Email" />
+            <Entry Placeholder="Contraseña" Text="{Binding Password}" IsPassword="True" />
+
+            <Button Text="Crear empresa"
+                    Command="{Binding RegistrarCommand}"
+                    BackgroundColor="#4CAF50"
+                    TextColor="White"
+                    CornerRadius="8"
+                    HeightRequest="50"/>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

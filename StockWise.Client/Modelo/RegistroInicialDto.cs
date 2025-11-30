@@ -1,4 +1,4 @@
-﻿namespace StockWise.api.Modelo
+﻿namespace StockWise.Client.Modelo
 {
     public class RegistroInicialDto
     {
