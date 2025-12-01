@@ -18,11 +18,11 @@ namespace StockWise.Client.Paginas
         public LectorQRPage()
         {
             InitializeComponent();
-    WeakReferenceMessenger.Default.Register<QRDetectedMessage>(this, async (r, m) =>
-{
-    if (!_isProcessing)
-        await ProcesarQR(m.Value);
-});
+            WeakReferenceMessenger.Default.Register<QRDetectedMessage>(this, async (r, m) =>
+        {
+            if (!_isProcessing)
+                await ProcesarQR(m.Value);
+        });
         }
 
         // ESCANER INTERNO
@@ -85,39 +85,22 @@ namespace StockWise.Client.Paginas
         // PROCESAR QR PARA AMBOS METODOS
         private async Task ProcesarQR(string qr)
         {
-            if (_isProcessing)
-                return;
-
+            if (_isProcessing) return;
             _isProcessing = true;
-
 
             try
             {
-                var api = new ApiService();
-                var producto = await api.GetProductoByQRAsync(qr);
-
-                if (producto == null)
-                {
-                    await MainThread.InvokeOnMainThreadAsync(async () =>
-                    {
-                        await Shell.Current.DisplayAlert("Error", "Producto no encontrado", "OK");
-                    });
-                    return;
-                }
-
-                await Shell.Current.GoToAsync(nameof(ModificarStockPage), true, new Dictionary<string, object>
-{
-    { "Producto", producto }
-});
+                await Shell.Current.GoToAsync($"ModificarStockPage?qr={Uri.EscapeDataString(qr)}");
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Error", ex.Message, "OK");
+                await DisplayAlert("Error", "Navegación fallida: " + ex.Message, "OK");
             }
             finally
             {
+                await Task.Delay(300);
                 _isProcessing = false;
             }
         }
     }
-}
+    }

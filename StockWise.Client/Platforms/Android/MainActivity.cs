@@ -34,20 +34,35 @@ public class MainActivity : MauiAppCompatActivity
             string resultado = data.GetStringExtra("SCAN_RESULT") ?? string.Empty;
             resultado = resultado.Trim().Replace("\n", "").Replace("\r", "").Replace(" ", "");
 
-            Toast.MakeText(this, "QR externo: " + resultado, ToastLength.Long).Show();
+            Toast.MakeText(this, "QR externo: " + resultado, ToastLength.Short).Show();
 
-            // 👇 NAVEGAR DESDE ANDROID -> MAUI
+            // Usamos BeginInvokeOnMainThread para seguridad
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                var app = Microsoft.Maui.Controls.Application.Current as App;
-
-                if (app?.MainPage != null)
+                try
                 {
-                    await app.MainPage.Navigation.PushAsync(new ModificarStockPage(resultado));
+                    // Intentamos la navegación Shell (preferida)
+                    if (Shell.Current != null)
+                    {
+                        await Shell.Current.GoToAsync($"ModificarStockPage?qr={Uri.EscapeDataString(resultado)}");
+                        return;
+                    }
+
+                    // Si Shell no existe, intentamos enviar al messenger (fallback)
+                    WeakReferenceMessenger.Default.Send(new QRDetectedMessage(resultado));
+                }
+                catch (Exception ex)
+                {
+                    // Fallback: enviar por messenger para que la page lo coja
+                    WeakReferenceMessenger.Default.Send(new QRDetectedMessage(resultado));
+
+                    // Mostrar el error para que puedas verlo cuando no depuras
+                    Toast.MakeText(this, "Navegation error: " + ex.Message, ToastLength.Long).Show();
+
+                    // opcional: log a Android log
+                    Android.Util.Log.Error("MainActivity", ex.ToString());
                 }
             });
-
         }
     }
-
 }

@@ -1,6 +1,13 @@
 ﻿using StockWise.Client.Modelo;
 using StockWise.Client.Services;
 using Microsoft.Maui.ApplicationModel.DataTransfer;
+#if WINDOWS
+using Windows.Storage;
+using Windows.Storage.Pickers;
+using WinRT.Interop;
+using Microsoft.UI.Xaml;
+using Microsoft.Maui.Platform;
+#endif
 
 
 namespace StockWise.Client.Paginas;
@@ -273,16 +280,43 @@ public partial class ProductosPage : ContentPage
                 return;
             }
 
-            // Guardar archivo en caché
-            var filePath = Path.Combine(FileSystem.CacheDirectory, "productos.csv");
+            var fileName = "productos.csv";
+
+#if WINDOWS
+        // --- EXPORTAR EN WINDOWS PC ---
+        var savePicker = new FileSavePicker();
+
+        // Necesario en MAUI WinUI
+        var window = App.Current.Windows[0].Handler.PlatformView as MauiWinUIWindow;
+        InitializeWithWindow.Initialize(savePicker, window.WindowHandle);
+
+        savePicker.SuggestedFileName = fileName;
+        savePicker.FileTypeChoices.Add("CSV File", new List<string>() { ".csv" });
+
+        StorageFile file = await savePicker.PickSaveFileAsync();
+
+        if (file != null)
+        {
+            using var stream = await file.OpenStreamForWriteAsync();
+            stream.Write(bytes, 0, bytes.Length);
+
+            await DisplayAlert("Éxito", $"Archivo guardado en:\n{file.Path}", "OK");
+        }
+        else
+        {
+            await DisplayAlert("Cancelado", "No se guardó el archivo.", "OK");
+        }
+#else
+            // --- ANDROID / iOS ---
+            var filePath = Path.Combine(FileSystem.CacheDirectory, fileName);
             File.WriteAllBytes(filePath, bytes);
 
-            // Compartir archivo usando Share.RequestAsync
             await Share.RequestAsync(new ShareFileRequest
             {
                 Title = "Exportar productos",
                 File = new ShareFile(filePath)
             });
+#endif
         }
         catch (Exception ex)
         {

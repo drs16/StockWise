@@ -10,28 +10,16 @@ public partial class App : Application
     {
         InitializeComponent();
 
-#if DEBUG
-        Preferences.Clear();
-#endif
+        // APK EMPLEADO -> NO HAY REGISTRO INICIAL
+        Preferences.Set("ModoSetup", false);
+        Preferences.Set("RegistroInicialCompletado", true);
 
-        MainPage = new AppShell(); // SIEMPRE Shell
+        MainPage = new AppShell();
 
+        // FORZAR SIEMPRE LOGIN
         MainPage.Dispatcher.Dispatch(async () =>
         {
             await Task.Delay(100);
-
-            bool registroHecho = Preferences.Get("RegistroInicialCompletado", false);
-            bool modoSetup = Preferences.Get("ModoSetup", true);
-            // TRUE por defecto la 1ª vez (no existe)
-
-            if (!registroHecho && modoSetup)
-            {
-                // Primera vez → Setup
-                await Shell.Current.GoToAsync("RegistroInicialPage");
-                return;
-            }
-
-            // Si ya se completó el registro → login
             await Shell.Current.GoToAsync("//login");
         });
 
@@ -52,8 +40,7 @@ public partial class App : Application
             if (producto == null)
             {
                 await MainThread.InvokeOnMainThreadAsync(() =>
-                    MainPage.DisplayAlert("Error", "Producto no encontrado", "OK")
-                );
+                    MainPage.DisplayAlert("Error", "Producto no encontrado", "OK"));
                 return;
             }
 
@@ -66,8 +53,7 @@ public partial class App : Application
         catch (Exception ex)
         {
             await MainThread.InvokeOnMainThreadAsync(() =>
-                MainPage.DisplayAlert("Error", ex.Message, "OK")
-            );
+                MainPage.DisplayAlert("Error", ex.Message, "OK"));
         }
     }
 }

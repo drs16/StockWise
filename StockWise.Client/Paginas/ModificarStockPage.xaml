@@ -5,6 +5,21 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     BackgroundColor="#0A0F1C">
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Style x:Key="KeypadButton" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="#1E2738" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="FontSize" Value="22" />
+                <Setter Property="HeightRequest" Value="60" />
+                <Setter Property="WidthRequest" Value="60" />
+                <Setter Property="Padding" Value="0" />
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <ScrollView Padding="20">
 
         <VerticalStackLayout Spacing="25">

@@ -9,9 +9,9 @@ public partial class AppShell : Shell
         InitializeComponent();
         Routing.RegisterRoute(nameof(ModificarStockPage), typeof(ModificarStockPage));
         Routing.RegisterRoute("CambiarPassword", typeof(CambiarPassword));
-        Routing.RegisterRoute(nameof(RegistroInicialPage), typeof(RegistroInicialPage));
+        //Routing.RegisterRoute(nameof(RegistroInicialPage), typeof(RegistroInicialPage));
         Routing.RegisterRoute("login", typeof(LoginPage));
-        Routing.RegisterRoute("RegistroInicialPage", typeof(RegistroInicialPage));
+        //Routing.RegisterRoute("RegistroInicialPage", typeof(RegistroInicialPage));
 
     }
 }

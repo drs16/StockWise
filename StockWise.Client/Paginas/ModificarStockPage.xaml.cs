@@ -4,54 +4,62 @@ using StockWise.Client.Services;
 
 namespace StockWise.Client.Paginas
 {
+    [QueryProperty(nameof(QR), "qr")]
     public partial class ModificarStockPage : ContentPage
     {
         private readonly ApiService _api = new ApiService();
         private ProductoDto _producto;
 
-        // ⭐ CONSTRUCTOR FINAL (recibe QR)
-        public ModificarStockPage(string qr)
+        public string QR
         {
-            InitializeComponent();
-            CargarProducto(qr);
+            set => _ = CargarProductoAsync(value);
         }
 
-        private async void CargarProducto(string qr)
+        public ModificarStockPage()
         {
-            await MainThread.InvokeOnMainThreadAsync(async () =>
+            InitializeComponent();
+        }
+
+        private async Task CargarProductoAsync(string qr)
+        {
+            try
             {
-                await DisplayAlert("DEBUG QR", $"QR RECIBIDO:\n{qr}", "OK");
-            });
+                _producto = await _api.GetProductoByQRAsync(qr);
 
-            System.Diagnostics.Debug.WriteLine("### QR recibido:");
-            System.Diagnostics.Debug.WriteLine(qr);
-
-            System.Diagnostics.Debug.WriteLine("### QR HEX:");
-            System.Diagnostics.Debug.WriteLine(
-                BitConverter.ToString(System.Text.Encoding.UTF8.GetBytes(qr))
-            );
-
-            _producto = await _api.GetProductoByQRAsync(qr);
-
-            if (_producto == null)
-            {
-                await MainThread.InvokeOnMainThreadAsync(async () =>
+                if (_producto == null)
                 {
                     await DisplayAlert("Error", "Producto no encontrado", "OK");
-                    await Navigation.PopAsync();
-                });
-                return;
-            }
+                    await Shell.Current.GoToAsync("..");
+                    return;
+                }
 
-            // Actualizar UI SIEMPRE en hilo principal
-            await MainThread.InvokeOnMainThreadAsync(() =>
-            {
                 NombreLabel.Text = _producto.Nombre;
                 CodigoLabel.Text = $"Código: {_producto.CodigoQR}";
                 StockLabel.Text = $"Stock actual: {_producto.Cantidad}";
-            });
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", ex.Message, "OK");
+            }
         }
+    
 
+
+
+
+private void OnAddClicked(object sender, EventArgs e)
+        {
+            if (int.TryParse(CantidadEntry.Text, out int cantidad) && cantidad > 0)
+            {
+                _producto.Cantidad += cantidad;
+                StockLabel.Text = _producto.Cantidad.ToString();
+                CantidadEntry.Text = ""; // limpiar
+            }
+            else
+            {
+                DisplayAlert("Error", "Introduce una cantidad válida", "OK");
+            }
+        }
 
         private void OnRemoveClicked(object sender, EventArgs e)
         {
