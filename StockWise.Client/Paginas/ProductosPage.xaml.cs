@@ -256,6 +256,8 @@ public partial class ProductosPage : ContentPage
         BtnImportar.IsVisible = esAdmin;
         BtnAdmin.IsVisible = esAdmin;
         BtnExportar.IsVisible = esAdmin;
+        BtnEditarEmpresa.IsVisible = esAdmin; // <- AÑADIDO
+
     }
 
     private async void OnExportarClicked(object sender, EventArgs e)
@@ -299,6 +301,13 @@ public partial class ProductosPage : ContentPage
         await Navigation.PushAsync(new LectorQRPage());
     }
 
+    private async void OnProductoTapped(object sender, EventArgs e)
+    {
+        if (sender is Frame frame && frame.BindingContext is ProductoDto producto)
+        {
+            await Navigation.PushAsync(new ProductoDetallePage(producto, _apiService));
+        }
+    }
 
 
 }

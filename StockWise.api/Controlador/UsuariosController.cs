@@ -214,5 +214,8 @@ namespace StockWise.api.Controlador
 
             return NoContent();
         }
+
+
+
     }
 }

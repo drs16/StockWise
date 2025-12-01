@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
-using Microsoft.Maui.Dispatching;
 using StockWise.Client.Paginas;
 using StockWise.Client.Services;
 
@@ -11,42 +10,38 @@ public partial class App : Application
     {
         InitializeComponent();
 
-        // ⭐ MODO DEBUG PARA PROBAR REGISTRO INICIAL SIN SEPARAR APKs ⭐
-        bool DEBUG_SETUP = true; // Cámbialo a false cuando quieras probar modo normal
+#if DEBUG
+        Preferences.Clear();
+#endif
 
-        if (DEBUG_SETUP)
-        {
-            // Simular que esta APK es modo setup
-            Preferences.Set("ModoSetup", true);
-        }
+        MainPage = new AppShell(); // SIEMPRE Shell
 
-        // 1️⃣ SI YA SE COMPLETÓ EL REGISTRO INICIAL → ENTRAR NORMAL
-        if (Preferences.Get("RegistroInicialCompletado", false))
+        MainPage.Dispatcher.Dispatch(async () =>
         {
-            MainPage = new AppShell();
-        }
-        else
-        {
-            // 2️⃣ SI ESTA APK ES MODO SETUP → MOSTRAR REGISTRO
-            if (Preferences.Get("ModoSetup", false))
+            await Task.Delay(100);
+
+            bool registroHecho = Preferences.Get("RegistroInicialCompletado", false);
+            bool modoSetup = Preferences.Get("ModoSetup", true);
+            // TRUE por defecto la 1ª vez (no existe)
+
+            if (!registroHecho && modoSetup)
             {
-                MainPage = new RegistroInicialPage();
+                // Primera vez → Setup
+                await Shell.Current.GoToAsync("RegistroInicialPage");
+                return;
             }
-            else
-            {
-                // 3️⃣ APP NORMAL (DESCARGADA DE QR NORMAL)
-                MainPage = new AppShell();
-            }
-        }
 
-        // 4️⃣ SEGUIR ESCUCHANDO QR DE PRODUCTOS (MANTIENE TU LÓGICA ORIGINAL)
+            // Si ya se completó el registro → login
+            await Shell.Current.GoToAsync("//login");
+        });
+
+        // QR Listener
         WeakReferenceMessenger.Default.Register<QRDetectedMessage>(this, async (r, m) =>
         {
             await ProcesarQRGlobal(m.Value);
         });
     }
 
-    // 🚀 PROCESAR QR DE PRODUCTOS (TU LÓGICA ORIGINAL)
     private async Task ProcesarQRGlobal(string qr)
     {
         try

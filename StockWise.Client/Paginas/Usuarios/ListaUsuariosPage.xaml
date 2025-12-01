@@ -141,50 +141,61 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Frame BackgroundColor="#121A2A"
-                           CornerRadius="10"
-                           Padding="10"
-                           Margin="0,5"
-                           HasShadow="False">
+           CornerRadius="10"
+           Padding="10"
+           Margin="0,5"
+           HasShadow="False">
 
-                        <Grid ColumnDefinitions="3*,3*,2*,Auto,Auto"
-      Padding="15,0">
+                        <Grid ColumnDefinitions="3*,3*,2*,Auto,Auto,Auto"
+              Padding="15,0">
 
-                            <Label Text="{Binding NombreUsuario}" TextColor="White"/>
+                            <!-- Nombre -->
+                            <Label Text="{Binding NombreUsuario}"
+                   TextColor="White"/>
 
+                            <!-- Email -->
                             <Label Grid.Column="1"
-           Text="{Binding Email}"
-           TextColor="#7DA0C0"/>
+                   Text="{Binding Email}"
+                   TextColor="#7DA0C0"/>
 
+                            <!-- Rol -->
                             <Label Grid.Column="2"
-           Text="{Binding Rol}"
-           TextColor="#4EE1A0"
-                                   Padding="30,0"/>
+                   Text="{Binding Rol}"
+                   TextColor="#4EE1A0"
+                   Padding="30,0"/>
 
+                            <!-- Editar -->
                             <Button Grid.Column="3"
-            Text="✏️"
-            BackgroundColor="Transparent"
-            TextColor="#4EE1A0"
-            Clicked="OnEditarClicked"
-            BindingContext="{Binding}" />
+                    Text="✏️"
+                    FontSize="18"
+                    BackgroundColor="Transparent"
+                    TextColor="#4EE1A0"
+                    Clicked="OnEditarClicked"
+                    BindingContext="{Binding}"/>
 
+                            <!-- Reset Password -->
                             <Button Grid.Column="4"
-            Text="🗑"
-            BackgroundColor="Transparent"
-            TextColor="#c62828"
-            Clicked="OnEliminarClicked"
-            BindingContext="{Binding}" />
+                    Text="🔁"
+                    FontSize="18"
+                    BackgroundColor="Transparent"
+                    TextColor="#FFB74D"
+                    Clicked="OnResetPasswordClicked"
+                    BindingContext="{Binding}"/>
 
-                            <Button Text="Reset"
-        BackgroundColor="#C62828"
-        TextColor="White"
-        FontSize="12"
-        Clicked="OnResetPasswordClicked"/>
+                            <!-- Eliminar -->
+                            <Button Grid.Column="5"
+                    Text="🗑"
+                    FontSize="18"
+                    BackgroundColor="Transparent"
+                    TextColor="#EF5350"
+                    Clicked="OnEliminarClicked"
+                    BindingContext="{Binding}"/>
 
                         </Grid>
 
-
                     </Frame>
                 </DataTemplate>
+
             </CollectionView.ItemTemplate>
 
         </CollectionView>

@@ -98,7 +98,10 @@ namespace StockWise.Client.Paginas
 
                 if (producto == null)
                 {
-                    await DisplayAlert("Error", "Producto no encontrado", "OK");
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        await Shell.Current.DisplayAlert("Error", "Producto no encontrado", "OK");
+                    });
                     return;
                 }
 

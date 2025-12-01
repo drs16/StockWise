@@ -131,17 +131,23 @@
 
             <CollectionView x:Name="ProductosList"
                             IsVisible="False"
-                            SelectionMode="Single"
+                            SelectionMode="None"
                             SelectionChanged="ProductosList_SelectionChanged">
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame CornerRadius="12"
-                               Margin="0,8"
-                               Padding="12"
-                               BackgroundColor="#121A2A"
-                               BorderColor="#1E2A44"
-                               HasShadow="True">
+       Margin="0,8"
+       Padding="12"
+       BackgroundColor="#121A2A"
+       BorderColor="#1E2A44"
+       HasShadow="False">
+
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer 
+            Tapped="OnProductoTapped"
+            NumberOfTapsRequired="1" />
+                            </Frame.GestureRecognizers>
 
                             <Grid ColumnDefinitions="*,Auto">
 
@@ -153,14 +159,15 @@
                                 </VerticalStackLayout>
 
                                 <Label Grid.Column="1"
-                                       Text="{Binding Precio, StringFormat='€{0:F2}'}"
-                                       FontSize="16"
-                                       FontAttributes="Bold"
-                                       VerticalOptions="Center"
-                                       TextColor="#4EE1A0"/>
+               Text="{Binding Precio, StringFormat='€{0:F2}'}"
+               FontSize="16"
+               FontAttributes="Bold"
+               VerticalOptions="Center"
+               TextColor="#4EE1A0"/>
                             </Grid>
 
                         </Frame>
+
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>

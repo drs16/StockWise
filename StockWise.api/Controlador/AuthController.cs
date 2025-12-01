@@ -6,6 +6,7 @@ using StockWise.api.Servicios;
 using StockWise.Api.Data;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 
 
@@ -75,11 +76,50 @@ namespace StockWise.api.Controlador
         [HttpPost("registroInicial")]
         public async Task<ActionResult> RegistroInicial(RegistroInicialDto dto)
         {
-            // 🛑 Validar NIF único
+            // ===========================================
+            // 1️⃣ VALIDACIONES DE EMPRESA
+            // ===========================================
+
+            // NIF válido
+            if (!Regex.IsMatch(dto.NIF ?? "", @"^[0-9]{8}[A-Za-z]$"))
+                return BadRequest("El NIF no es válido. Debe tener 8 números y una letra.");
+
+            // NIF duplicado
             if (await _context.Empresas.AnyAsync(e => e.NIF == dto.NIF))
                 return BadRequest("Ya existe una empresa registrada con ese NIF.");
 
-            // 1️⃣ Crear empresa
+            // Nombre empresa duplicado
+            if (await _context.Empresas.AnyAsync(e => e.Nombre == dto.NombreEmpresa))
+                return BadRequest("El nombre de la empresa ya está registrado.");
+
+            // Email empresa válido
+            if (!Regex.IsMatch(dto.EmailEmpresa ?? "", @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                return BadRequest("El email de la empresa no es válido.");
+
+            // ===========================================
+            // 2️⃣ VALIDACIONES DE USUARIO ADMIN
+            // ===========================================
+
+            // Email admin válido
+            if (!Regex.IsMatch(dto.AdminEmail ?? "", @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                return BadRequest("El email del administrador no es válido.");
+
+            // Email admin duplicado
+            if (await _context.Usuarios.AnyAsync(u => u.Email == dto.AdminEmail))
+                return BadRequest("El email del administrador ya está registrado.");
+
+            // Contraseña segura
+            if (!Regex.IsMatch(dto.Password ?? "",
+                @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*_\-]).{8,}$"))
+            {
+                return BadRequest("La contraseña debe tener al menos 8 caracteres, " +
+                                  "incluyendo mayúscula, minúscula, número y un símbolo.");
+            }
+
+            // ===========================================
+            // 3️⃣ CREAR EMPRESA
+            // ===========================================
+
             var empresa = new Empresa
             {
                 Nombre = dto.NombreEmpresa,
@@ -89,11 +129,13 @@ namespace StockWise.api.Controlador
                 Telefono = dto.TelefonoEmpresa
             };
 
-
             _context.Empresas.Add(empresa);
-            await _context.SaveChangesAsync(); // aquí empresa.Id ya tiene valor
+            await _context.SaveChangesAsync(); // ahora empresa.Id ya existe
 
-            // 2️⃣ Crear usuario administrador
+            // ===========================================
+            // 4️⃣ CREAR USUARIO ADMINISTRADOR
+            // ===========================================
+
             var usuarioAdmin = new Usuario
             {
                 NombreUsuario = dto.AdminNombre,
@@ -106,10 +148,12 @@ namespace StockWise.api.Controlador
             _context.Usuarios.Add(usuarioAdmin);
             await _context.SaveChangesAsync();
 
-            // 3️⃣ Crear token JWT
+            // ===========================================
+            // 5️⃣ GENERAR TOKEN
+            // ===========================================
+
             var token = _tokenService.GenerateToken(usuarioAdmin);
 
-            // 4️⃣ Devolverlo todo
             return Ok(new
             {
                 empresaId = empresa.Id,
@@ -117,6 +161,7 @@ namespace StockWise.api.Controlador
                 token = token
             });
         }
+
 
     }
 

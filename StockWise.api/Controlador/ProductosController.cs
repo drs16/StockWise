@@ -16,6 +16,14 @@ namespace StockWise.api.Controlador
         private readonly AppDbContext _context;
         private readonly QRService _qrService;
 
+        private int ObtenerEmpresaId()
+        {
+            var claim = User.Claims.FirstOrDefault(c => c.Type == "EmpresaId")?.Value;
+            if (string.IsNullOrEmpty(claim))
+                throw new Exception("No se pudo obtener EmpresaId del token.");
+            return int.Parse(claim);
+        }
+
         public ProductosController(AppDbContext context, QRService qrService)
         {
             _context = context;
@@ -50,14 +58,17 @@ namespace StockWise.api.Controlador
         [HttpGet("porQR/{codigo}")]
         public async Task<ActionResult<Producto>> GetPorQR(string codigo)
         {
+            int empresaId = ObtenerEmpresaId();
+
             var producto = await _context.Productos
-                .FirstOrDefaultAsync(p => p.CodigoQR == codigo);
+                .FirstOrDefaultAsync(p => p.CodigoQR == codigo && p.EmpresaId == empresaId);
 
             if (producto == null)
-                return NotFound();
+                return NotFound("Producto no encontrado o no pertenece a tu empresa.");
 
             return producto;
         }
+
 
         [HttpGet("exportar")]
         public async Task<IActionResult> ExportarCSV()
@@ -213,8 +224,6 @@ namespace StockWise.api.Controlador
 
             return File(bytes, "text/csv", $"productos_empresa_{empresaId}.csv");
         }
-
-
 
     }
 }

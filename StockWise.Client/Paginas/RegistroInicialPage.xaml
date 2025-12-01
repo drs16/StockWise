@@ -8,35 +8,194 @@
         <vm:RegistroInicialViewModel />
     </ContentPage.BindingContext>
 
-    <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="15">
+    <Grid>
 
-            <Label Text="Registro Inicial"
-                   HorizontalOptions="Center"
-                   FontSize="28"
-                   FontAttributes="Bold"/>
+        <!-- 🌅 Fondo -->
+        <Image Source="fondo.png"
+               Aspect="AspectFill"
+               Opacity="1" />
 
-            <Label Text="Datos de la empresa" FontAttributes="Bold" />
+        <!-- 🧱 CONTENIDO -->
+        <ScrollView>
 
-            <Entry Placeholder="Nombre de la empresa" Text="{Binding NombreEmpresa}" />
-            <Entry Placeholder="NIF" Text="{Binding Nif}" />
-            <Entry Placeholder="Dirección" Text="{Binding Direccion}" />
-            <Entry Placeholder="Email empresa" Text="{Binding EmailEmpresa}" Keyboard="Email" />
-            <Entry Placeholder="Teléfono" Text="{Binding TelefonoEmpresa}" Keyboard="Telephone" />
+            <VerticalStackLayout Padding="40,40"
+                                 Spacing="25"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Start">
 
-            <Label Text="Administrador" FontAttributes="Bold" />
+                <!-- ⭐ ENCABEZADO -->
+                <Frame Padding="14"
+                       BackgroundColor="#BB000000"   
+                    CornerRadius="18"
+                       HasShadow="False"
+                       HorizontalOptions="Center">
 
-            <Entry Placeholder="Nombre administrador" Text="{Binding AdminNombre}" />
-            <Entry Placeholder="Email administrador" Text="{Binding AdminEmail}" Keyboard="Email" />
-            <Entry Placeholder="Contraseña" Text="{Binding Password}" IsPassword="True" />
+                    <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
 
-            <Button Text="Crear empresa"
-                    Command="{Binding RegistrarCommand}"
-                    BackgroundColor="#4CAF50"
-                    TextColor="White"
-                    CornerRadius="8"
-                    HeightRequest="50"/>
-        </VerticalStackLayout>
-    </ScrollView>
+                        <!-- LOGO -->
+                        <Image Source="logo.png"
+                               HeightRequest="110"
+                               HorizontalOptions="Center" />
+
+                        <!-- TITULO -->
+                        <Label Text="Registro Inicial"
+                               FontSize="28"
+                               FontAttributes="Bold"
+                               TextColor="White"
+                               HorizontalOptions="Center" />
+
+                        <!-- SUBTITULO -->
+                        <Label Text="Complete la información para registrar su empresa"
+                               FontSize="14"
+                               TextColor="#E6E6E6"
+                               HorizontalOptions="Center"
+                               HorizontalTextAlignment="Center"
+                               WidthRequest="320" />
+
+                        <Label Text="Datos de la empresa"
+                               FontAttributes="Bold"
+                               FontSize="20"
+                               TextColor="White"
+                               HorizontalOptions="Center"
+                               Margin="0,10,0,0" />
+
+                    </VerticalStackLayout>
+
+                </Frame>
+
+
+                <!-- CAMPOS EMPRESA -->
+                <Border BackgroundColor="#CC000000"
+                        StrokeThickness="1"
+                        Stroke="#88FFFFFF"
+                        StrokeShape="RoundRectangle 15"
+                        Padding="12">
+                    <Entry Placeholder="Nombre de la empresa"
+                           Text="{Binding NombreEmpresa}"
+                           TextColor="White"
+                           PlaceholderColor="#DDDDDD"
+                           FontSize="16" />
+                </Border>
+
+                <Border BackgroundColor="#CC000000"
+                        StrokeThickness="1"
+                        Stroke="#88FFFFFF"
+                        StrokeShape="RoundRectangle 15"
+                        Padding="12">
+                    <Entry Placeholder="NIF"
+                           Text="{Binding Nif}"
+                           TextColor="White"
+                           PlaceholderColor="#DDDDDD"
+                           FontSize="16" />
+                </Border>
+
+                <Border BackgroundColor="#CC000000"
+                        StrokeThickness="1"
+                        Stroke="#88FFFFFF"
+                        StrokeShape="RoundRectangle 15"
+                        Padding="12">
+                    <Entry Placeholder="Dirección"
+                           Text="{Binding Direccion}"
+                           TextColor="White"
+                           PlaceholderColor="#DDDDDD"
+                           FontSize="16" />
+                </Border>
+
+                <Border BackgroundColor="#CC000000"
+                        StrokeThickness="1"
+                        Stroke="#88FFFFFF"
+                        StrokeShape="RoundRectangle 15"
+                        Padding="12">
+                    <Entry Placeholder="Email empresa"
+                           Keyboard="Email"
+                           Text="{Binding EmailEmpresa}"
+                           TextColor="White"
+                           PlaceholderColor="#DDDDDD"
+                           FontSize="16" />
+                </Border>
+
+                <Border BackgroundColor="#CC000000"
+                        StrokeThickness="1"
+                        Stroke="#88FFFFFF"
+                        StrokeShape="RoundRectangle 15"
+                        Padding="12">
+                    <Entry Placeholder="Teléfono"
+                           Keyboard="Telephone"
+                           Text="{Binding TelefonoEmpresa}"
+                           TextColor="White"
+                           PlaceholderColor="#DDDDDD"
+                           FontSize="16" />
+                </Border>
+
+
+                <!-- ADMINISTRADOR -->
+                <Label Text="Administrador"
+                       FontAttributes="Bold"
+                       FontSize="20"
+                       TextColor="White"
+                       HorizontalOptions="Center"
+                       Margin="0,20,0,0" />
+
+                <Label Text="Datos del usuario que gestionará la empresa"
+                       FontSize="14"
+                       TextColor="#CCCCCC"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"
+                       Margin="0,0,0,10" />
+
+
+                <Border BackgroundColor="#CC000000"
+                        StrokeThickness="1"
+                        Stroke="#88FFFFFF"
+                        StrokeShape="RoundRectangle 15"
+                        Padding="12">
+                    <Entry Placeholder="Nombre administrador"
+                           Text="{Binding AdminNombre}"
+                           TextColor="White"
+                           PlaceholderColor="#DDDDDD"
+                           FontSize="16" />
+                </Border>
+
+                <Border BackgroundColor="#CC000000"
+                        StrokeThickness="1"
+                        Stroke="#88FFFFFF"
+                        StrokeShape="RoundRectangle 15"
+                        Padding="12">
+                    <Entry Placeholder="Email administrador"
+                           Keyboard="Email"
+                           Text="{Binding AdminEmail}"
+                           TextColor="White"
+                           PlaceholderColor="#DDDDDD"
+                           FontSize="16" />
+                </Border>
+
+                <Border BackgroundColor="#CC000000"
+                        StrokeThickness="1"
+                        Stroke="#88FFFFFF"
+                        StrokeShape="RoundRectangle 15"
+                        Padding="12">
+                    <Entry Placeholder="Contraseña"
+                           IsPassword="True"
+                           Text="{Binding Password}"
+                           TextColor="White"
+                           PlaceholderColor="#DDDDDD"
+                           FontSize="16" />
+                </Border>
+
+                <!-- BOTÓN -->
+                <Button Text="Crear empresa"
+                        Command="{Binding RegistrarCommand}"
+                        FontSize="18"
+                        TextColor="White"
+                        CornerRadius="25"
+                        HeightRequest="55"
+                        BackgroundColor="#0A84FF"
+                        Margin="0,20,0,30"/>
+
+            </VerticalStackLayout>
+
+        </ScrollView>
+
+    </Grid>
 
 </ContentPage>

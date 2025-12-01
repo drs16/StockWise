@@ -18,7 +18,10 @@ namespace StockWise.Client.Paginas
 
         private async void CargarProducto(string qr)
         {
-            await DisplayAlert("DEBUG QR", $"QR RECIBIDO:\n{qr}", "OK");
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                await DisplayAlert("DEBUG QR", $"QR RECIBIDO:\n{qr}", "OK");
+            });
 
             System.Diagnostics.Debug.WriteLine("### QR recibido:");
             System.Diagnostics.Debug.WriteLine(qr);
@@ -32,28 +35,23 @@ namespace StockWise.Client.Paginas
 
             if (_producto == null)
             {
-                await DisplayAlert("Error", "Producto no encontrado", "OKKK");
-                await Navigation.PopAsync();
+                await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    await DisplayAlert("Error", "Producto no encontrado", "OK");
+                    await Navigation.PopAsync();
+                });
                 return;
             }
 
-            NombreLabel.Text = _producto.Nombre;
-            CodigoLabel.Text = $"Código: {_producto.CodigoQR}";
-            StockLabel.Text = $"Stock actual: {_producto.Cantidad}";
-        }
-        private void OnAddClicked(object sender, EventArgs e)
-        {
-            if (int.TryParse(CantidadEntry.Text, out int cantidad) && cantidad > 0)
+            // Actualizar UI SIEMPRE en hilo principal
+            await MainThread.InvokeOnMainThreadAsync(() =>
             {
-                _producto.Cantidad += cantidad;
-                StockLabel.Text = _producto.Cantidad.ToString();
-                CantidadEntry.Text = ""; // limpiar
-            }
-            else
-            {
-                DisplayAlert("Error", "Introduce una cantidad válida", "OK");
-            }
+                NombreLabel.Text = _producto.Nombre;
+                CodigoLabel.Text = $"Código: {_producto.CodigoQR}";
+                StockLabel.Text = $"Stock actual: {_producto.Cantidad}";
+            });
         }
+
 
         private void OnRemoveClicked(object sender, EventArgs e)
         {

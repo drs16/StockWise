@@ -34,7 +34,7 @@ namespace StockWise.Client.ViewModels
             var dto = new RegistroInicialDto
             {
                 NombreEmpresa = NombreEmpresa,
-                NIF = nif,
+                NIF = Nif,
                 Direccion = Direccion,
                 EmailEmpresa = EmailEmpresa,
                 TelefonoEmpresa = TelefonoEmpresa,
@@ -57,24 +57,28 @@ namespace StockWise.Client.ViewModels
 
                 var result = await response.Content.ReadFromJsonAsync<RegistroInicialRespuesta>();
 
-                // GUARDAR TOKEN
+                // GUARDAR TOKEN TEMPORAL (si lo necesitas para debug)
                 await SecureStorage.SetAsync("auth_token", result.Token);
 
-                // ⭐️ MARCAR QUE EL REGISTRO INICIAL SE COMPLETÓ
-                Preferences.Set("RegistroInicialCompletado", true);
+                // ⭐ MARCAR QUE YA SE HIZO EL REGISTRO INICIAL
                 Preferences.Set("ModoSetup", false);
+                Preferences.Set("RegistroInicialCompletado", true);
+                // Borrar tokens por si acaso
+                SecureStorage.Remove("jwt_token");
+                SecureStorage.Remove("auth_token");
 
                 await App.Current.MainPage.DisplayAlert("Éxito",
                     "Registro completado correctamente.",
                     "OK");
 
-                // 🚀 NAVEGAR AL FLUJO NORMAL
-                await Shell.Current.GoToAsync("///MainPage");
+                // 🚀 IR AL LOGIN
+                await Shell.Current.GoToAsync("//login");
             }
             catch (Exception ex)
             {
                 await App.Current.MainPage.DisplayAlert("Error", ex.Message, "OK");
             }
         }
+
     }
 }
