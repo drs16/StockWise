@@ -10,26 +10,23 @@ public partial class App : Application
     {
         InitializeComponent();
 
-        // APK EMPLEADO -> NO HAY REGISTRO INICIAL
-        Preferences.Set("ModoSetup", false);
-        Preferences.Set("RegistroInicialCompletado", true);
-
         MainPage = new AppShell();
 
-        // FORZAR SIEMPRE LOGIN
+        // 🔥 SIEMPRE empezar por login
         MainPage.Dispatcher.Dispatch(async () =>
         {
             await Task.Delay(100);
             await Shell.Current.GoToAsync("//login");
         });
 
-        // QR Listener
+        // Listener QR (si lo usas)
         WeakReferenceMessenger.Default.Register<QRDetectedMessage>(this, async (r, m) =>
         {
             await ProcesarQRGlobal(m.Value);
         });
     }
 
+    // 👇 esto no se toca
     private async Task ProcesarQRGlobal(string qr)
     {
         try
@@ -40,7 +37,8 @@ public partial class App : Application
             if (producto == null)
             {
                 await MainThread.InvokeOnMainThreadAsync(() =>
-                    MainPage.DisplayAlert("Error", "Producto no encontrado", "OK"));
+                    MainPage.DisplayAlert("Error", "Producto no encontrado", "OK")
+                );
                 return;
             }
 
@@ -53,7 +51,8 @@ public partial class App : Application
         catch (Exception ex)
         {
             await MainThread.InvokeOnMainThreadAsync(() =>
-                MainPage.DisplayAlert("Error", ex.Message, "OK"));
+                MainPage.DisplayAlert("Error", ex.Message, "OK")
+            );
         }
     }
 }

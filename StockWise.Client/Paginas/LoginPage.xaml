@@ -70,6 +70,13 @@
                        FontSize="14"
                        HorizontalOptions="Center" />
 
+                <Button Text="Registrar nueva empresa"
+        FontSize="14"
+        BackgroundColor="Transparent"
+        TextColor="White"
+        Clicked="OnRegistrarEmpresaClicked"/>
+
+
             </VerticalStackLayout>
         </ScrollView>
     </Grid>

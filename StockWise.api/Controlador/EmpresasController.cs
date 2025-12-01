@@ -118,6 +118,12 @@ namespace StockWise.Api.Controlador
             return Ok(empresa);
         }
 
+        [HttpGet("existe")]
+        public async Task<IActionResult> EmpresaExiste()
+        {
+            bool existe = await _context.Empresas.AnyAsync();
+            return Ok(new { existe });
+        }
 
     }
 

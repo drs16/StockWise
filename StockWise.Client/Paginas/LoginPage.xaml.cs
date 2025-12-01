@@ -101,4 +101,10 @@ public partial class LoginPage : ContentPage
 
         return jwt.Claims.FirstOrDefault(c => c.Type == claimType)?.Value;
     }
+
+    private async void OnRegistrarEmpresaClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("RegistroInicialPage");
+    }
+
 }
