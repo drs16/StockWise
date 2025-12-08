@@ -57,7 +57,7 @@ public partial class LoginPage : ContentPage
 
         var empresaId = GetClaim(token, "EmpresaId") ?? "";
         var rol = GetClaim(token, "role");
-        var nombre = GetClaim(token, "name"); // puede venir como esquema completo
+        var nombre = GetClaim(token, "name"); 
                                               // nombre o email: si nombre vacío, usamos el email que ya conocemos
         var usuarioNombre = string.IsNullOrEmpty(nombre) ? email : nombre;
         var debeCambiar = GetClaim(token, "DebeCambiarPassword") ?? "false";
@@ -71,7 +71,6 @@ public partial class LoginPage : ContentPage
         if (string.IsNullOrEmpty(empresaId))
         {
             await DisplayAlert("Aviso", "EmpresaId no se encontró en el token. Comprueba el token o el servidor.", "OK");
-            // Puedes elegir fallar aquí o seguir navegando; yo solo aviso.
         }
 
         await DisplayAlert("Éxito", "Inicio de sesión correcto", "OK");

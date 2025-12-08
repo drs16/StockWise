@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage 
+<ContentPage
     x:Class="StockWise.Client.Paginas.EditarProductoPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="#0A0F1C"
     Title="Editar Producto">
 
-    <VerticalStackLayout Padding="20" Spacing="15">
+    <VerticalStackLayout Padding="20" Spacing="15" >
 
-        <Entry x:Name="NombreEntry" Placeholder="Nombre del producto"/>
-        <Entry x:Name="ProveedorEntry" Placeholder="Proveedor"/>
-        <Entry x:Name="CantidadEntry" Placeholder="Cantidad" Keyboard="Numeric"/>
-        <Entry x:Name="PrecioEntry" Placeholder="Precio" Keyboard="Numeric"/>
+        <Entry x:Name="NombreEntry" Placeholder="Nombre del producto" TextColor="White"/>
+        <Entry x:Name="ProveedorEntry" Placeholder="Proveedor" TextColor="White"/>
+        <Entry x:Name="CantidadEntry" Placeholder="Cantidad" Keyboard="Numeric" TextColor="White"/>
+        <Entry x:Name="PrecioEntry" Placeholder="Precio" Keyboard="Numeric" TextColor="White"/>
 
         <Button Text="Guardar cambios"
                 BackgroundColor="#00A79D"

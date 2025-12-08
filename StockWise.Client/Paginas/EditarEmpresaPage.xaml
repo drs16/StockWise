@@ -45,6 +45,8 @@
                        Placeholder="NIF"
                        BackgroundColor="Transparent"
                        TextColor="White"
+                       IsReadOnly="True"
+                       IsEnabled="False"
                        PlaceholderColor="#7DA0C0"/>
             </Border>
 

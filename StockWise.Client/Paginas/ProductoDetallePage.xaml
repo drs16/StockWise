@@ -3,63 +3,113 @@
     x:Class="StockWise.Client.Paginas.ProductoDetallePage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Detalle del producto"
-    BackgroundColor="#E8F8F6">
-    
-    <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="20">
-            <Button Text="← Volver"
-        Clicked="OnVolverClicked"
-        BackgroundColor="#121A2A"
-        TextColor="White"
-        CornerRadius="10"
-        FontAttributes="Bold"
-        HeightRequest="45"
-        HorizontalOptions="Start"
-        WidthRequest="120"/>
+    BackgroundColor="#0A0F1C"
+    Title="Detalle del Producto">
 
-            <!-- Nombre del producto -->
+    <ScrollView BackgroundColor="#0A0F1C">
+        <VerticalStackLayout Padding="25" Spacing="22" BackgroundColor="#0A0F1C">
+
+            <!-- Botón volver -->
+            <Button Text="← Volver"
+                    Clicked="OnVolverClicked"
+                    BackgroundColor="#121A2A"
+                    TextColor="White"
+                    CornerRadius="10"
+                    FontAttributes="Bold"
+                    HeightRequest="45"
+                    HorizontalOptions="Start"
+                    WidthRequest="120"/>
+
+            <!-- Título -->
             <Label x:Name="NombreLabel"
                    FontSize="28"
                    FontAttributes="Bold"
-                   TextColor="#01796f"/>
+                   HorizontalOptions="Center"
+                   TextColor="#4EE1A0"
+                   Margin="0,10"/>
 
             <!-- Imagen del QR -->
-            <Frame Padding="10" CornerRadius="15" BackgroundColor="White" HasShadow="True">
-                <Image x:Name="QrImage" HeightRequest="200"/>
+            <Frame Padding="15"
+                   CornerRadius="20"
+                   BackgroundColor="#121A2A"
+                   HasShadow="True"
+                   HorizontalOptions="Center">
+                <Image x:Name="QrImage"
+                       HeightRequest="220"
+                       WidthRequest="220"/>
             </Frame>
 
             <!-- Datos del producto -->
-            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto">
+            <VerticalStackLayout Spacing="15">
 
-                <Label Text="Proveedor:" Grid.Row="0" Grid.Column="0" TextColor="Gray"/>
-                <Label x:Name="ProveedorLabel" Grid.Row="0" Grid.Column="1"/>
+                <!-- Proveedor -->
+                <Label Text="Proveedor"
+                       FontSize="16"
+                       TextColor="#4EE1A0"/>
+                <Border Stroke="#121A2A"
+                        StrokeThickness="1"
+                        BackgroundColor="#121A2A"
+                        StrokeShape="RoundRectangle 10"
+                        Padding="10">
+                    <Label x:Name="ProveedorLabel"
+                           TextColor="White"
+                           FontSize="16"/>
+                </Border>
 
-                <Label Text="Cantidad:" Grid.Row="1" Grid.Column="0" TextColor="Gray"/>
-                <Label x:Name="CantidadLabel" Grid.Row="1" Grid.Column="1"/>
+                <!-- Cantidad -->
+                <Label Text="Cantidad"
+                       FontSize="16"
+                       TextColor="#4EE1A0"/>
+                <Border Stroke="#121A2A"
+                        StrokeThickness="1"
+                        BackgroundColor="#121A2A"
+                        StrokeShape="RoundRectangle 10"
+                        Padding="10">
+                    <Label x:Name="CantidadLabel"
+                           TextColor="White"
+                           FontSize="16"/>
+                </Border>
 
-                <Label Text="Precio:" Grid.Row="2" Grid.Column="0" TextColor="Gray"/>
-                <Label x:Name="PrecioLabel" Grid.Row="2" Grid.Column="1"/>
-            </Grid>
+                <!-- Precio -->
+                <Label Text="Precio (€)"
+                       FontSize="16"
+                       TextColor="#4EE1A0"/>
+                <Border Stroke="#121A2A"
+                        StrokeThickness="1"
+                        BackgroundColor="#121A2A"
+                        StrokeShape="RoundRectangle 10"
+                        Padding="10">
+                    <Label x:Name="PrecioLabel"
+                           TextColor="White"
+                           FontSize="16"/>
+                </Border>
 
-            <!-- Botones -->
-            <HorizontalStackLayout Spacing="10">
+            </VerticalStackLayout>
 
-                <Button Text="Editar"
+            <!-- Botones de acción -->
+            <HorizontalStackLayout Spacing="15" Margin="0,20,0,0" HorizontalOptions="Center">
+
+                <Button Text="✏ Editar"
                         Clicked="OnEditarClicked"
-                        BackgroundColor="#00A79D"
-                        TextColor="White"
-                        CornerRadius="10"
-                        WidthRequest="120"/>
+                        BackgroundColor="#4EE1A0"
+                        TextColor="#0A0F1C"
+                        FontAttributes="Bold"
+                        CornerRadius="12"
+                        WidthRequest="130"
+                        HeightRequest="50"/>
 
-                <Button Text="Eliminar"
+                <Button Text="🗑 Eliminar"
                         Clicked="OnEliminarClicked"
                         BackgroundColor="#c62828"
                         TextColor="White"
-                        CornerRadius="10"
-                        WidthRequest="120"/>
+                        FontAttributes="Bold"
+                        CornerRadius="12"
+                        WidthRequest="130"
+                        HeightRequest="50"/>
+
             </HorizontalStackLayout>
 
         </VerticalStackLayout>
     </ScrollView>
+
 </ContentPage>

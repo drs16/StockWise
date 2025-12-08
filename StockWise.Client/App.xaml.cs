@@ -19,14 +19,13 @@ public partial class App : Application
             await Shell.Current.GoToAsync("//login");
         });
 
-        // Listener QR (si lo usas)
+        // Listener QR (
         WeakReferenceMessenger.Default.Register<QRDetectedMessage>(this, async (r, m) =>
         {
             await ProcesarQRGlobal(m.Value);
         });
     }
 
-    // 👇 esto no se toca
     private async Task ProcesarQRGlobal(string qr)
     {
         try

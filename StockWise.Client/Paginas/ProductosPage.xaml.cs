@@ -23,6 +23,12 @@ public partial class ProductosPage : ContentPage
     {
         InitializeComponent();
         _apiService = new ApiService();
+
+#if ANDROID
+        BtnQR.IsVisible = true;
+#else
+    BtnQR.IsVisible = false;
+#endif
     }
 
     protected override async void OnAppearing()

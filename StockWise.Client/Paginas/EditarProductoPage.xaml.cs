@@ -30,7 +30,7 @@ public partial class EditarProductoPage : ContentPage
             Proveedor = ProveedorEntry.Text,
             Cantidad = int.Parse(CantidadEntry.Text),
             Precio = decimal.Parse(PrecioEntry.Text),
-            CodigoQR = "" // si lo usas
+            CodigoQR = "" 
         };
 
         var exito = await _apiService.EditarProductoAsync(_productoId, productoEditado);
@@ -38,7 +38,7 @@ public partial class EditarProductoPage : ContentPage
         if (exito)
         {
             await DisplayAlert("Éxito", "Producto modificado correctamente.", "OK");
-            await Shell.Current.GoToAsync("..");
+            await Shell.Current.GoToAsync("//productos");
         }
         else
         {

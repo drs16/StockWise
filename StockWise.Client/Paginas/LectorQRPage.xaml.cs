@@ -41,7 +41,6 @@ namespace StockWise.Client.Paginas
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            // Aquí no hacemos nada ya
         }
 
         // ESCÁNER EXTERNO

@@ -77,40 +77,43 @@ namespace StockWise.api.Controlador
         // Crear un usuario
         [Authorize(Roles = "Administrador")]
         [HttpPost]
-        public async Task<ActionResult<Usuario>> PostUsuario(CrearUsuarioDto dto)
+        public async Task<IActionResult> PostUsuario(CrearUsuarioDto dto)
         {
             // Validar email
-            if (!Regex.IsMatch(dto.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            if (!Regex.IsMatch(dto.Email ?? "", @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
                 return BadRequest("El email no es válido.");
 
             // Email duplicado
             if (await _context.Usuarios.AnyAsync(u => u.Email == dto.Email))
                 return BadRequest("El email ya está registrado.");
 
-            // Validar contraseña segura
-            if (!Regex.IsMatch(dto.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*_\-]).{8,}$"))
-                return BadRequest("La contraseña debe tener mínimo 8 caracteres, mayúscula, minúscula, número y símbolo.");
-
             int empresaId = ObtenerEmpresaId();
+
+            // Generar contraseña temporal automática
+            string tempPass = GenerarPasswordTemporal();
+
+            using var sha = SHA256.Create();
+            string hash = Convert.ToBase64String(
+                sha.ComputeHash(Encoding.UTF8.GetBytes(tempPass))
+            );
 
             var usuario = new Usuario
             {
                 NombreUsuario = dto.NombreUsuario,
                 Email = dto.Email,
                 EmpresaId = empresaId,
-                Rol = "Empleado"
+                Rol = "Empleado",
+                PasswordHash = hash,
+                DebeCambiarPassword = true
             };
-
-            using var sha = SHA256.Create();
-            usuario.PasswordHash = Convert.ToBase64String(
-                sha.ComputeHash(Encoding.UTF8.GetBytes(dto.Password))
-            );
 
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetUsuario), new { id = usuario.Id }, usuario);
+            // 👉 devolver la contraseña temporal
+            return Ok(new { tempPassword = tempPass });
         }
+
 
         // Editar usuario
         [Authorize(Roles = "Administrador")]
@@ -169,9 +172,9 @@ namespace StockWise.api.Controlador
             var usuario = await _context.Usuarios.FindAsync(id);
 
             if (usuario == null)
-                return NotFound();
+                return NotFound("Usuario no encontrado.");
 
-            string tempPass = Guid.NewGuid().ToString().Substring(0, 8);
+            string tempPass = GenerarPasswordTemporal();
 
             using var sha = SHA256.Create();
             usuario.PasswordHash = Convert.ToBase64String(
@@ -183,6 +186,20 @@ namespace StockWise.api.Controlador
             await _context.SaveChangesAsync();
 
             return Ok(new { tempPassword = tempPass });
+        }
+
+
+
+        private string GenerarPasswordTemporal()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*_-";
+            var random = new Random();
+            var pass = new char[8];
+
+            for (int i = 0; i < pass.Length; i++)
+                pass[i] = chars[random.Next(chars.Length)];
+
+            return "Tmp" + new string(pass);
         }
 
         // ======================================================

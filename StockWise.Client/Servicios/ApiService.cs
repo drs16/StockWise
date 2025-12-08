@@ -255,22 +255,20 @@ public class ApiService
             })!;
     }
 
-    public async Task<bool> CrearUsuarioAsync(CrearUsuarioDto usuario)
+    public async Task<string?> CrearUsuarioAsync(CrearUsuarioDto dto)
     {
         var token = await SecureStorage.GetAsync("jwt_token");
-
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
 
-        var json = JsonSerializer.Serialize(usuario);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var resp = await _httpClient.PostAsJsonAsync("Usuarios", dto);
 
-        var response = await _httpClient.PostAsync("Usuarios", content);
+        if (!resp.IsSuccessStatusCode)
+            return null;
 
-        var body = await response.Content.ReadAsStringAsync();
-        Console.WriteLine("[CREAR-USUARIO] Respuesta: " + body);
-
-        return response.IsSuccessStatusCode;
+        var json = await resp.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(json);
+        return doc.RootElement.GetProperty("tempPassword").GetString();
     }
 
 
@@ -437,7 +435,7 @@ public class ApiService
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
 
-        var resp = await _httpClient.PostAsync($"Usuarios/resetPassword/{usuarioId}", null);
+        var resp = await _httpClient.PostAsync($"Usuarios/{usuarioId}/reset-password", null);
 
         if (!resp.IsSuccessStatusCode)
             return null;
@@ -445,8 +443,10 @@ public class ApiService
         var json = await resp.Content.ReadAsStringAsync();
 
         using var doc = JsonDocument.Parse(json);
-        return doc.RootElement.GetProperty("temporal").GetString();
+
+        return doc.RootElement.GetProperty("tempPassword").GetString();
     }
+
 
     public async Task<bool> CambiarMiPassword(string nueva)
     {

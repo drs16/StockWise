@@ -48,12 +48,16 @@ namespace StockWise.Client.ViewModels
 
                 if (!response.IsSuccessStatusCode)
                 {
+                    var error = await response.Content.ReadAsStringAsync();
+
                     await App.Current.MainPage.DisplayAlert(
                         "Error",
-                        "No se pudo registrar la empresa. ¿El NIF o el email ya existen?",
+                        error,
                         "OK");
+
                     return;
                 }
+
 
                 await App.Current.MainPage.DisplayAlert(
                     "Éxito",

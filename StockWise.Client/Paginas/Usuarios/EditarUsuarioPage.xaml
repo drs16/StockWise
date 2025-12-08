@@ -24,7 +24,6 @@
         <Picker x:Name="RolPicker"
         SelectedItem="{Binding Rol}">
             <Picker.Items>
-                <x:String>Administrador</x:String>
                 <x:String>Empleado</x:String>
             </Picker.Items>
         </Picker>

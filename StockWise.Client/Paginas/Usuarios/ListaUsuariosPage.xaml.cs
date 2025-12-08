@@ -97,7 +97,8 @@ public partial class ListaUsuariosPage : ContentPage
 
     private async void OnPerfilClicked(object sender, EventArgs e)
     {
-        await DisplayAlert("Mi perfil", "Aquí mostraremos los datos del usuario actual 👤", "OK");
+       
+        await Navigation.PushAsync(new MiPerfilPage());
     }
 
     private async void OnAdminClicked(object sender, EventArgs e)

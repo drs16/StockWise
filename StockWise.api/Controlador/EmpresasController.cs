@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using StockWise.api.Modelo;
 using StockWise.Api.Data;
 using System.Text;
+using System.Text.RegularExpressions;
 
 
 namespace StockWise.Api.Controlador
@@ -48,11 +49,45 @@ namespace StockWise.Api.Controlador
         public async Task<IActionResult> PutEmpresa(int id, Empresa dto)
         {
             var empresa = await _context.Empresas.FindAsync(id);
-
             if (empresa == null)
                 return NotFound("Empresa no encontrada.");
 
-            // Actualizar campos
+            // ===========================================
+            // 1️⃣ VALIDAR NIF
+            // ===========================================
+
+            if (!Regex.IsMatch(dto.NIF ?? "", @"^[0-9]{8}[A-Za-z]$"))
+                return BadRequest("El NIF no es válido. Debe tener 8 números y una letra.");
+
+            // NIF duplicado (excluyendo a la propia empresa)
+            if (await _context.Empresas.AnyAsync(e => e.NIF == dto.NIF && e.Id != id))
+                return BadRequest("Ese NIF ya pertenece a otra empresa.");
+
+
+            // ===========================================
+            // 2️⃣ VALIDAR NOMBRE EMPRESA
+            // ===========================================
+
+            if (await _context.Empresas.AnyAsync(e => e.Nombre == dto.Nombre && e.Id != id))
+                return BadRequest("El nombre de la empresa ya está registrado por otra empresa.");
+
+
+            // ===========================================
+            // 3️⃣ VALIDAR EMAIL
+            // ===========================================
+
+            if (!Regex.IsMatch(dto.Email ?? "", @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                return BadRequest("El email no es válido.");
+
+            // Email repetido en otra empresa
+            if (await _context.Empresas.AnyAsync(e => e.Email == dto.Email && e.Id != id))
+                return BadRequest("Ese email ya lo utiliza otra empresa.");
+
+
+            // ===========================================
+            // 4️⃣ ACTUALIZAR DATOS
+            // ===========================================
+
             empresa.Nombre = dto.Nombre;
             empresa.NIF = dto.NIF;
             empresa.Direccion = dto.Direccion;
@@ -63,6 +98,7 @@ namespace StockWise.Api.Controlador
 
             return Ok(new { message = "Empresa actualizada con éxito" });
         }
+
 
 
         [HttpDelete("{id}")]

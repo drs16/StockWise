@@ -233,6 +233,7 @@
                 HeightRequest="48"
                 CornerRadius="18"
                 Margin="20,0,20,20"
+                x:Name="BtnQR"
                 Clicked="AbrirLectorQR"/>
 
     </Grid>
