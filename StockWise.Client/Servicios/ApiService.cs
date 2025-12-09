@@ -255,39 +255,29 @@ public class ApiService
             })!;
     }
 
-    public async Task<string?> CrearUsuarioAsync(CrearUsuarioDto dto)
+
+    public async Task<string> CrearUsuarioAsync(CrearUsuarioDto dto)
     {
         var token = await SecureStorage.GetAsync("jwt_token");
+
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
 
-        var resp = await _httpClient.PostAsJsonAsync("Usuarios", dto);
+        var json = JsonSerializer.Serialize(dto);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var resp = await _httpClient.PostAsync("Usuarios", content);
+
+        string result = await resp.Content.ReadAsStringAsync();
 
         if (!resp.IsSuccessStatusCode)
-            return null;
+        {
+            // 👉 devolver error literal del servidor
+            return $"ERROR:{result}";
+        }
 
-        var json = await resp.Content.ReadAsStringAsync();
-        using var doc = JsonDocument.Parse(json);
-        return doc.RootElement.GetProperty("tempPassword").GetString();
-    }
-
-
-
-
-
-    public async Task<bool> ActualizarUsuarioAsync(UsuarioDto usuario)
-    {
-        var token = await SecureStorage.GetAsync("jwt_token");
-
-        _httpClient.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", token);
-
-        var json = JsonSerializer.Serialize(usuario);
-
-        var response = await _httpClient.PutAsync($"Usuarios/{usuario.Id}",
-            new StringContent(json, Encoding.UTF8, "application/json"));
-
-        return response.IsSuccessStatusCode;
+        using var doc = JsonDocument.Parse(result);
+        return doc.RootElement.GetProperty("tempPassword").GetString()!;
     }
 
 
@@ -469,6 +459,26 @@ public class ApiService
         var body = await response.Content.ReadAsStringAsync();
         Console.WriteLine("[CP] Status: " + response.StatusCode);
         Console.WriteLine("[CP] Body: " + body);
+
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> ActualizarUsuarioAsync(UsuarioDto usuario)
+    {
+        var token = await SecureStorage.GetAsync("jwt_token");
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
+
+        var dto = new EditarUsuarioDto
+        {
+            NombreUsuario = usuario.NombreUsuario,
+            Email = usuario.Email
+        };
+
+        var json = JsonSerializer.Serialize(dto);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await _httpClient.PutAsync($"usuarios/{usuario.Id}", content);
 
         return response.IsSuccessStatusCode;
     }

@@ -1,4 +1,5 @@
-﻿using StockWise.Client.Modelo;
+﻿using StockWise.Client.Componentes;
+using StockWise.Client.Modelo;
 using StockWise.Client.Services;
 
 namespace StockWise.Client.Paginas.Usuarios;
@@ -138,26 +139,40 @@ public partial class ListaUsuariosPage : ContentPage
         if ((sender as Button)?.BindingContext is not UsuarioDto usuario)
             return;
 
-        bool confirmar = await DisplayAlert(
+        // Confirmación
+        var confirmarPopup = new ConfirmacionModalPage(
             "Resetear contraseña",
-            $"¿Deseas resetear la contraseña de {usuario.NombreUsuario}?",
-            "Sí", "No");
+            $"¿Resetear la contraseña de {usuario.NombreUsuario}?"
+        );
+
+        await Navigation.PushModalAsync(confirmarPopup);
+        bool confirmar = await confirmarPopup.EsperarRespuesta;
 
         if (!confirmar) return;
 
+        // API
         var nueva = await _apiService.ResetearPassword(usuario.Id);
 
-        if (nueva == null)
+        if (nueva == null || nueva.StartsWith("ERROR:"))
         {
-            await DisplayAlert("Error", "No se pudo resetear la contraseña.", "OK");
+            var msg = nueva?.Replace("ERROR:", "") ?? "No se pudo resetear la contraseña.";
+            var popupErr = new MensajeModalPage("Error", msg);
+            await Navigation.PushModalAsync(popupErr);
+            await popupErr.EsperarCierre;
+            return;
         }
-        else
-        {
-            await DisplayAlert("Contraseña reseteada",
-                $"Nueva contraseña temporal:\n\n{nueva}\n\nEl usuario deberá cambiarla al iniciar sesión.",
-                "OK");
-        }
+
+        // Éxito con texto copiable
+        var popupOk = new MensajeModalPage(
+            "Contraseña reseteada",
+            "Nueva contraseña temporal:",
+            nueva
+        );
+
+        await Navigation.PushModalAsync(popupOk);
+        await popupOk.EsperarCierre;
     }
+
 
     private async void OnEditarEmpresaClicked(object sender, EventArgs e)
     {

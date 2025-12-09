@@ -92,6 +92,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Componentes\ConfirmacionModalPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="ModificarStockPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
