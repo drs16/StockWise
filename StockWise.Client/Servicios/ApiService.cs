@@ -474,6 +474,25 @@ public class ApiService
     }
 
 
+    public async Task<List<MovimientoStockDto>> GetMovimientosAsync(int empresaId)
+    {
+        var token = await SecureStorage.GetAsync("jwt_token");
+
+        _httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
+
+        var resp = await _httpClient.GetAsync($"Productos/movimientos/{empresaId}");
+
+        if (!resp.IsSuccessStatusCode)
+            return new List<MovimientoStockDto>();
+
+        var json = await resp.Content.ReadAsStringAsync();
+
+        return JsonSerializer.Deserialize<List<MovimientoStockDto>>(json,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+    }
+
+
 
 
 }

@@ -349,5 +349,12 @@ public partial class ProductosPage : ContentPage
         }
     }
 
+    private async void OnMovimientosClicked(object sender, EventArgs e)
+    {
+        await CloseMenu();
+        await Navigation.PushAsync(new MovimientoStockPage(_apiService));
+    }
+
+
 
 }

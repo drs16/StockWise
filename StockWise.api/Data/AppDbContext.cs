@@ -10,5 +10,7 @@ namespace StockWise.Api.Data
         public DbSet<Empresa> Empresas { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Producto> Productos { get; set; }
+        public DbSet<MovimientoStock> MovimientosStock { get; set; }
+
     }
 }

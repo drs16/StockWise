@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="StockWise.Client.Paginas.MovimientoStockPage"
+    BackgroundColor="#0A0F1C"
+    Title="Movimientos de Stock">
+
+    <VerticalStackLayout Padding="20" Spacing="10">
+
+        <!-- Buscador -->
+        <Entry x:Name="BuscarEntry"
+               Placeholder="Buscar por usuario..."
+               TextColor="White"
+               PlaceholderColor="#7DA0C0"
+               TextChanged="OnBuscarChanged"/>
+
+        <!-- Lista -->
+        <CollectionView x:Name="MovimientosList">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame BackgroundColor="#121A2A"
+                           Padding="15"
+                           CornerRadius="12">
+
+                        <VerticalStackLayout>
+
+                            <Label Text="{Binding NombreProducto}"
+                                   FontSize="18"
+                                   TextColor="#4EE1A0"/>
+
+                            <Label Text="{Binding NombreUsuario}"
+                                   TextColor="White"/>
+
+                            <Label Text="{Binding Diferencia}"
+                                   TextColor="Orange"/>
+
+                            <Label Text="{Binding Fecha}"
+                                   TextColor="#7DA0C0"
+                                   FontSize="12"/>
+                        </VerticalStackLayout>
+
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </VerticalStackLayout>
+</ContentPage>

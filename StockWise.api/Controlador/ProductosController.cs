@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using StockWise.api.Modelo;
 using StockWise.api.Servicios;
 using StockWise.Api.Data;
+using System.Security.Claims;
 using System.Text;
 
 namespace StockWise.api.Controlador
@@ -68,6 +69,15 @@ namespace StockWise.api.Controlador
 
             return producto;
         }
+
+        private int ObtenerUsuarioId()
+        {
+            var claim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(claim))
+                throw new Exception("No se pudo obtener UsuarioId del token.");
+            return int.Parse(claim);
+        }
+
 
 
         [HttpGet("exportar")]
@@ -161,11 +171,21 @@ namespace StockWise.api.Controlador
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> PutProducto(int id, ProductoDto dto)
         {
-            var producto = await _context.Productos.FindAsync(id);
+            int empresaId = ObtenerEmpresaId();
+            int usuarioId = ObtenerUsuarioId();
+
+            var usuarioNombre = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value ?? "Desconocido";
+
+            var producto = await _context.Productos
+                .FirstOrDefaultAsync(p => p.Id == id && p.EmpresaId == empresaId);
 
             if (producto == null)
-                return NotFound();
+                return NotFound("Producto no encontrado o no pertenece a tu empresa.");
 
+            // Guardar cantidad anterior
+            int cantidadAntes = producto.Cantidad;
+
+            // ========== ACTUALIZAR PRODUCTO ==========
             producto.Nombre = dto.Nombre;
             producto.Cantidad = dto.Cantidad;
             producto.Precio = dto.Precio;
@@ -174,9 +194,26 @@ namespace StockWise.api.Controlador
             if (!string.IsNullOrEmpty(dto.CodigoQR))
                 producto.CodigoQR = dto.CodigoQR;
 
+            // ========== REGISTRAR MOVIMIENTO ==========
+            var mov = new MovimientoStock
+            {
+                EmpresaId = empresaId,
+                UsuarioId = usuarioId,
+                ProductoId = producto.Id,
+                CantidadAntes = cantidadAntes,
+                CantidadDespues = dto.Cantidad,
+                Fecha = DateTime.UtcNow,
+                NombreUsuario = usuarioNombre,
+                NombreProducto = producto.Nombre
+            };
+
+            _context.MovimientosStock.Add(mov);
+
             await _context.SaveChangesAsync();
-            return NoContent();
+
+            return Ok(new { message = "Producto actualizado", movimientoId = mov.Id });
         }
+
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Administrador")]
@@ -224,6 +261,21 @@ namespace StockWise.api.Controlador
 
             return File(bytes, "text/csv", $"productos_empresa_{empresaId}.csv");
         }
+
+        // ===============================
+        // 📌 Obtener movimientos por empresa (EN PRODUCTOS CONTROLLER)
+        // ===============================
+        [HttpGet("movimientos/{empresaId}")]
+        public async Task<ActionResult<IEnumerable<MovimientoStock>>> GetMovimientos(int empresaId)
+        {
+            var movimientos = await _context.MovimientosStock
+                .Where(m => m.EmpresaId == empresaId)
+                .OrderByDescending(m => m.Fecha)
+                .ToListAsync();
+
+            return Ok(movimientos);
+        }
+
 
     }
 }

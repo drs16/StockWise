@@ -19,11 +19,6 @@
                PlaceholderColor="#7DA0C0"
                Keyboard="Email"/>
 
-        <Entry x:Name="PasswordEntry"
-               Placeholder="Contraseña"
-               TextColor="White"
-               PlaceholderColor="#7DA0C0"
-               IsPassword="True"/>
 
         <Label Text="Rol: Empleado"
        TextColor="White"

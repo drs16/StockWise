@@ -94,6 +94,19 @@
             </Grid>
 
             <Grid ColumnDefinitions="Auto">
+                <Button Text="📜 Movimientos"
+            BackgroundColor="#1E2A44"
+            TextColor="White"
+            CornerRadius="10"
+            HeightRequest="40"
+            WidthRequest="170"
+            HorizontalOptions="Start"
+            Clicked="OnMovimientosClicked"/>
+            </Grid>
+
+
+
+            <Grid ColumnDefinitions="Auto">
                 <Button Text="🚪 Cerrar sesión"
                         BackgroundColor="#c62828"
                         TextColor="White"
