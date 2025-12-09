@@ -6,44 +6,77 @@
     BackgroundColor="#0A0F1C"
     Title="Movimientos de Stock">
 
-    <VerticalStackLayout Padding="20" Spacing="10">
+    <VerticalStackLayout Padding="25" Spacing="15">
 
-        <!-- Buscador -->
-        <Entry x:Name="BuscarEntry"
-               Placeholder="Buscar por usuario..."
-               TextColor="White"
-               PlaceholderColor="#7DA0C0"
-               TextChanged="OnBuscarChanged"/>
+        <!-- TÍTULO -->
+        <Label Text="Historial de movimientos"
+               FontSize="26"
+               FontAttributes="Bold"
+               TextColor="#4EE1A0"
+               HorizontalOptions="Center"
+               Margin="0,10,0,20"/>
 
-        <!-- Lista -->
-        <CollectionView x:Name="MovimientosList">
+        <!-- BUSCADOR -->
+        <Border Stroke="#121A2A"
+                BackgroundColor="#121A2A"
+                StrokeShape="RoundRectangle 12"
+                Padding="12">
+
+            <Entry x:Name="BuscarEntry"
+                   Placeholder="🔍 Buscar por usuario..."
+                   BackgroundColor="Transparent"
+                   TextColor="White"
+                   PlaceholderColor="#7DA0C0"
+                   FontSize="16"
+                   TextChanged="OnBuscarChanged"/>
+        </Border>
+
+        <!-- LISTA -->
+        <CollectionView x:Name="MovimientosList"
+                        VerticalOptions="FillAndExpand"
+                        Margin="0,10,0,0">
+
             <CollectionView.ItemTemplate>
                 <DataTemplate>
+
                     <Frame BackgroundColor="#121A2A"
+                           CornerRadius="14"
                            Padding="15"
-                           CornerRadius="12">
+                           Margin="0,5"
+                           HasShadow="True">
 
-                        <VerticalStackLayout>
+                        <VerticalStackLayout Spacing="5">
 
+                            <!-- PRODUCTO -->
                             <Label Text="{Binding NombreProducto}"
+                                   FontAttributes="Bold"
                                    FontSize="18"
                                    TextColor="#4EE1A0"/>
 
+                            <!-- USUARIO -->
                             <Label Text="{Binding NombreUsuario}"
-                                   TextColor="White"/>
+                                   TextColor="White"
+                                   FontSize="15"/>
 
+                            <!-- DIFERENCIA (+x / -x unidades) -->
                             <Label Text="{Binding Diferencia}"
-                                   TextColor="Orange"/>
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="{Binding ColorCambio}"/>
 
-                            <Label Text="{Binding Fecha}"
+                            <!-- FECHA -->
+                            <Label Text="{Binding FechaFormateada}"
                                    TextColor="#7DA0C0"
                                    FontSize="12"/>
                         </VerticalStackLayout>
 
                     </Frame>
+
                 </DataTemplate>
             </CollectionView.ItemTemplate>
+
         </CollectionView>
 
     </VerticalStackLayout>
+
 </ContentPage>

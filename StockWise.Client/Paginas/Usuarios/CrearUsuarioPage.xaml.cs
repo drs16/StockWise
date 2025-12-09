@@ -1,5 +1,6 @@
 ﻿using StockWise.Client.Modelo;
 using StockWise.Client.Services;
+using StockWise.Client.Componentes;
 
 namespace StockWise.Client.Paginas.Usuarios;
 
@@ -18,7 +19,9 @@ public partial class CrearUsuarioPage : ContentPage
         if (string.IsNullOrWhiteSpace(NombreEntry.Text) ||
             string.IsNullOrWhiteSpace(EmailEntry.Text))
         {
-            await DisplayAlert("Error", "Por favor completa todos los campos.", "OK");
+            var popup = new MensajeModalPage("Error", "Por favor completa todos los campos.");
+            await Navigation.PushModalAsync(popup);
+            await popup.EsperarCierre;
             return;
         }
 
@@ -32,16 +35,22 @@ public partial class CrearUsuarioPage : ContentPage
 
         if (tempPass == null)
         {
-            await DisplayAlert("Error", "No se pudo crear el usuario.", "OK");
+            var popup = new MensajeModalPage("Error", "No se pudo crear el usuario.");
+            await Navigation.PushModalAsync(popup);
+            await popup.EsperarCierre;
             return;
         }
 
-        await DisplayAlert("Usuario creado",
-            $"Contraseña temporal generada:\n\n{tempPass}\n\nEl usuario deberá cambiarla al iniciar sesión.",
-            "OK");
+        // Popup con contraseña copiable
+        var popupOk = new MensajeModalPage(
+            "Usuario creado",
+            "Se generó la siguiente contraseña temporal:",
+            tempPass
+        );
+
+        await Navigation.PushModalAsync(popupOk);
+        await popupOk.EsperarCierre;
 
         await Navigation.PopAsync();
     }
-
-
 }

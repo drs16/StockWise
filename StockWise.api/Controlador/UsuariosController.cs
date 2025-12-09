@@ -192,15 +192,16 @@ namespace StockWise.api.Controlador
 
         private string GenerarPasswordTemporal()
         {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*_-";
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             var random = new Random();
-            var pass = new char[8];
+            var pass = new char[4]; 
 
             for (int i = 0; i < pass.Length; i++)
                 pass[i] = chars[random.Next(chars.Length)];
 
             return "Tmp" + new string(pass);
         }
+
 
         // ======================================================
         // 📌 MÉTODOS PARA CUALQUIER USUARIO AUTENTICADO

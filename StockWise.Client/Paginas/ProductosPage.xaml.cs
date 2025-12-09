@@ -212,7 +212,6 @@ public partial class ProductosPage : ContentPage
     {
         if (menuVisible)
         {
-            // si quieres animación:
             await MenuContainer.FadeTo(0, 120);
             MenuContainer.IsVisible = false;
             menuVisible = false;

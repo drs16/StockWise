@@ -1,4 +1,5 @@
-﻿using StockWise.Client.Services;
+﻿using StockWise.Client.Componentes;
+using StockWise.Client.Services;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace StockWise.Client.Paginas;
@@ -73,7 +74,10 @@ public partial class LoginPage : ContentPage
             await DisplayAlert("Aviso", "EmpresaId no se encontró en el token. Comprueba el token o el servidor.", "OK");
         }
 
-        await DisplayAlert("Éxito", "Inicio de sesión correcto", "OK");
+        var popup = new MensajeModalPage("Éxito", "Inicio de sesión correcto");
+        await Navigation.PushModalAsync(popup);
+        await popup.EsperarCierre;  
+
 
         var flag = await SecureStorage.GetAsync("debe_cambiar");
 

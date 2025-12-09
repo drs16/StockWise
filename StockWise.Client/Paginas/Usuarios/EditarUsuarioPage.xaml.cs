@@ -1,5 +1,6 @@
 ﻿using StockWise.Client.Modelo;
 using StockWise.Client.Services;
+using StockWise.Client.Componentes;
 
 namespace StockWise.Client.Paginas.Usuarios;
 
@@ -18,9 +19,6 @@ public partial class EditarUsuarioPage : ContentPage
         BindingContext = usuario;
     }
 
-
-
-
     private async void OnGuardarClicked(object sender, EventArgs e)
     {
         usuario.NombreUsuario = NombreEntry.Text.Trim();
@@ -30,12 +28,17 @@ public partial class EditarUsuarioPage : ContentPage
 
         if (ok)
         {
-            await DisplayAlert("Éxito", "Usuario modificado con éxito.", "OK");
+            var popup = new MensajeModalPage("Éxito", "Usuario modificado con éxito.");
+            await Navigation.PushModalAsync(popup);
+            await popup.EsperarCierre;
+
             await Navigation.PopAsync();
         }
         else
         {
-            await DisplayAlert("Error", "No se pudo modificar el usuario.", "OK");
+            var popup = new MensajeModalPage("Error", "No se pudo modificar el usuario.");
+            await Navigation.PushModalAsync(popup);
+            await popup.EsperarCierre;
         }
     }
 }

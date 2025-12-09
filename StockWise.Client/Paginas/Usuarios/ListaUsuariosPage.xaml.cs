@@ -159,4 +159,27 @@ public partial class ListaUsuariosPage : ContentPage
         }
     }
 
+    private async void OnEditarEmpresaClicked(object sender, EventArgs e)
+    {
+        await CloseMenu();
+        await Navigation.PushAsync(new EditarEmpresaPage(_apiService));
+    }
+
+    private async void OnMovimientosClicked(object sender, EventArgs e)
+    {
+        await CloseMenu();
+        await Navigation.PushAsync(new MovimientoStockPage(_apiService));
+    }
+
+
+    // Cierra el menú (centraliza la lógica)
+    private async Task CloseMenu()
+    {
+        if (menuVisible)
+        {
+            await MenuContainer.FadeTo(0, 120);
+            MenuContainer.IsVisible = false;
+            menuVisible = false;
+        }
+    }
 }

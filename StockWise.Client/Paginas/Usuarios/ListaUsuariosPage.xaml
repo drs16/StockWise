@@ -1,205 +1,224 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="StockWise.Client.Paginas.Usuarios.ListaUsuariosPage"
-             Title="Gestión de usuarios"
-             BackgroundColor="#0A0F1C">
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="StockWise.Client.Paginas.Usuarios.ListaUsuariosPage"
+    Title="Gestión de usuarios"
+    BackgroundColor="#0A0F1C">
 
-    <VerticalStackLayout Padding="20" Spacing="15">
-        <Grid RowDefinitions="Auto, *">
+    <!-- ============================================================= -->
+    <!-- GRID PRINCIPAL → Igual que en ProductosPage -->
+    <!-- ============================================================= -->
+    <Grid RowDefinitions="Auto, Auto, *"
+          Padding="0">
 
-            <!-- ============================================================= -->
-            <!-- 🔥 FILA 0: HEADER con menú hamburguesa -->
-            <!-- ============================================================= -->
-            <Grid Grid.Row="0"
-          ColumnDefinitions="Auto, *"
-          Padding="15,20">
+        <!-- ============================================================= -->
+        <!-- 🔥 FILA 0: HEADER -->
+        <!-- ============================================================= -->
+        <Grid Grid.Row="0"
+              ColumnDefinitions="Auto, *"
+              Padding="15,20">
 
-                <!-- Botón hamburguesa -->
-                <Frame Padding="5"
-               BackgroundColor="Transparent"
-               HasShadow="False"
-               HorizontalOptions="Start"
-               VerticalOptions="Center">
+            <!-- Botón hamburguesa -->
+            <Frame Padding="5"
+                   BackgroundColor="Transparent"
+                   HasShadow="False"
+                   HorizontalOptions="Start"
+                   VerticalOptions="Center">
 
-                    <Label Text="☰"
-                   FontSize="32"
-                   TextColor="White">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnMenuToggleClicked"/>
-                        </Label.GestureRecognizers>
-                    </Label>
+                <Label Text="☰"
+                       FontSize="32"
+                       TextColor="White">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnMenuToggleClicked"/>
+                    </Label.GestureRecognizers>
+                </Label>
 
-                </Frame>
+            </Frame>
 
-                <Label Grid.Column="1"
-               Text="QRStock - Usuarios"
-               HorizontalOptions="Center"
-               VerticalOptions="Center"
-               FontSize="22"
-               FontAttributes="Bold"
-               TextColor="#4EE1A0"/>
-            </Grid>
+            <Label Grid.Column="1"
+                   Text="QRStock - Usuarios"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   TextColor="#4EE1A0"/>
+        </Grid>
 
 
-            <!-- ============================================================= -->
-            <!-- 🔥 FILA 1: CONTENIDO  -->
-            <!-- ============================================================= -->
-            <VerticalStackLayout Grid.Row="1"
-                         Padding="20"
-                         Spacing="15">
-                <StackLayout x:Name="MenuContainer"
-             Grid.Row="0"
-             Margin="15,70,0,0"
+        <!-- ============================================================= -->
+        <!-- 🔥 FILA 1: MENÚ DESPLEGABLE (IGUAL QUE PRODUCTOS) -->
+        <!-- ============================================================= -->
+        <StackLayout x:Name="MenuContainer"
+             Grid.Row="1"
              Padding="10"
              BackgroundColor="#121A2A"
              WidthRequest="200"
-             HeightRequest="160"
              Opacity="0.92"
              IsVisible="False"
              HorizontalOptions="Start"
              VerticalOptions="Start"
+             Margin="15,10,0,0"
              Spacing="10">
 
-                    <Button Text="👤 Mi perfil"
+            <Button Text="👤 Mi perfil"
             BackgroundColor="#1E2A44"
             TextColor="White"
             CornerRadius="10"
             HeightRequest="40"
             WidthRequest="170"
+            HorizontalOptions="Start"
             Clicked="OnPerfilClicked"/>
 
-                    <Button Text="📦 Productos"
-        BackgroundColor="#1E2A44"
-        TextColor="White"
-        CornerRadius="10"
-        HeightRequest="40"
-        WidthRequest="170"
-        x:Name="BtnProductos"                    
-        Clicked="OnProductosClicked"/>
+            <Button Text="📦 Productos"
+            BackgroundColor="#1E2A44"
+            TextColor="White"
+            CornerRadius="10"
+            HeightRequest="40"
+            WidthRequest="170"
+            HorizontalOptions="Start"
+            x:Name="BtnProductos"
+            Clicked="OnProductosClicked"/>
 
-                    <Button Text="🚪 Cerrar sesión"
+   
+                <Button Text="🏢 Editar empresa"
+                BackgroundColor="#1E2A44"
+                TextColor="White"
+                CornerRadius="10"
+                HeightRequest="40"
+                WidthRequest="170"
+                HorizontalOptions="Start"
+                x:Name="BtnEditarEmpresa"
+                Clicked="OnEditarEmpresaClicked"/>
+           
+
+            <Button Text="📜 Movimientos"
+            BackgroundColor="#1E2A44"
+            TextColor="White"
+            CornerRadius="10"
+            HeightRequest="40"
+            WidthRequest="170"
+            HorizontalOptions="Start"
+            Clicked="OnMovimientosClicked"/>
+
+            <Button Text="🚪 Cerrar sesión"
             BackgroundColor="#c62828"
             TextColor="White"
             CornerRadius="10"
             HeightRequest="40"
             WidthRequest="170"
+            HorizontalOptions="Start"
             Clicked="OnLogoutClicked"/>
 
-                </StackLayout>
+        </StackLayout>
 
+
+
+
+        <!-- ============================================================= -->
+        <!-- 🔥 FILA 2: CONTENIDO PRINCIPAL -->
+        <!-- ============================================================= -->
+        <ScrollView Grid.Row="2">
+            <VerticalStackLayout Padding="20" Spacing="15">
+
+                <!-- Botón crear usuario -->
+                <Button Text="+ Crear usuario"
+                        BackgroundColor="#4EE1A0"
+                        TextColor="#0A0F1C"
+                        CornerRadius="12"
+                        HeightRequest="45"
+                        x:Name="BtnCrearUsuario"
+                        Clicked="OnCrearUsuarioClicked"/>
+
+                <!-- CABECERA TABLA -->
+                <Frame BackgroundColor="#121A2A"
+                       CornerRadius="10"
+                       Padding="5"
+                       HasShadow="False">
+
+                    <Grid ColumnDefinitions="3*,3*,2*,Auto,Auto">
+                        <Label Text="Usuario"
+                               TextColor="#4EE1A0"
+                               FontAttributes="Bold"/>
+
+                        <Label Grid.Column="1"
+                               Text="Email"
+                               TextColor="#4EE1A0"
+                               FontAttributes="Bold"/>
+
+                        <Label Grid.Column="2"
+                               Text="Rol"
+                               TextColor="#4EE1A0"
+                               FontAttributes="Bold"/>
+
+                        <Label Grid.Column="3"/>
+                        <Label Grid.Column="4"/>
+                    </Grid>
+                </Frame>
+
+                <!-- LISTA DE USUARIOS -->
+                <CollectionView x:Name="UsuariosList"
+                                SelectionMode="None">
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+
+                            <Frame BackgroundColor="#121A2A"
+                                   CornerRadius="10"
+                                   Padding="10"
+                                   Margin="0,5"
+                                   HasShadow="False">
+
+                                <Grid ColumnDefinitions="3*,3*,2*,Auto,Auto,Auto"
+                                      Padding="15,0">
+
+                                    <Label Text="{Binding NombreUsuario}"
+                                           TextColor="White"/>
+
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Email}"
+                                           TextColor="#7DA0C0"/>
+
+                                    <Label Grid.Column="2"
+                                           Text="{Binding Rol}"
+                                           TextColor="#4EE1A0"
+                                           Padding="30,0"/>
+
+                                    <Button Grid.Column="3"
+                                            Text="✏️"
+                                            FontSize="18"
+                                            BackgroundColor="Transparent"
+                                            TextColor="#4EE1A0"
+                                            Clicked="OnEditarClicked"
+                                            BindingContext="{Binding}"/>
+
+                                    <Button Grid.Column="4"
+                                            Text="🔁"
+                                            FontSize="18"
+                                            BackgroundColor="Transparent"
+                                            TextColor="#FFB74D"
+                                            Clicked="OnResetPasswordClicked"
+                                            BindingContext="{Binding}"/>
+
+                                    <Button Grid.Column="5"
+                                            Text="🗑"
+                                            FontSize="18"
+                                            BackgroundColor="Transparent"
+                                            TextColor="#EF5350"
+                                            Clicked="OnEliminarClicked"
+                                            BindingContext="{Binding}"/>
+
+                                </Grid>
+                            </Frame>
+
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                </CollectionView>
 
             </VerticalStackLayout>
+        </ScrollView>
 
-        </Grid>
-
-        <!-- Botón crear usuario -->
-        <Button Text="+ Crear usuario"
-                BackgroundColor="#4EE1A0"
-                TextColor="#0A0F1C"
-                CornerRadius="12"
-                HeightRequest="45"
-                x:Name="BtnCrearUsuario"
-                Clicked="OnCrearUsuarioClicked"/>
-
-        <!-- CABECERA -->
-        <Frame BackgroundColor="#121A2A"
-       CornerRadius="10"
-       Padding="5"
-       HasShadow="False">
-
-            <Grid ColumnDefinitions="3*,3*,2*,Auto,Auto">
-
-                <Label Text="Usuario"
-               TextColor="#4EE1A0"
-               FontAttributes="Bold"/>
-
-                <Label Grid.Column="1"
-               Text="Email"
-               TextColor="#4EE1A0"
-               FontAttributes="Bold"/>
-
-                <Label Grid.Column="2"
-               Text="Rol"
-               TextColor="#4EE1A0"
-               FontAttributes="Bold"/>
-
-                <!-- columnas 3 y 4 vacías -->
-                <Label Grid.Column="3"/>
-                <Label Grid.Column="4"/>
-
-            </Grid>
-        </Frame>
-
-
-
-        <!-- LISTA -->
-        <CollectionView x:Name="UsuariosList"
-                        ItemsSource="{Binding Usuarios}"
-                        SelectionMode="None">
-
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame BackgroundColor="#121A2A"
-           CornerRadius="10"
-           Padding="10"
-           Margin="0,5"
-           HasShadow="False">
-
-                        <Grid ColumnDefinitions="3*,3*,2*,Auto,Auto,Auto"
-              Padding="15,0">
-
-                            <!-- Nombre -->
-                            <Label Text="{Binding NombreUsuario}"
-                   TextColor="White"/>
-
-                            <!-- Email -->
-                            <Label Grid.Column="1"
-                   Text="{Binding Email}"
-                   TextColor="#7DA0C0"/>
-
-                            <!-- Rol -->
-                            <Label Grid.Column="2"
-                   Text="{Binding Rol}"
-                   TextColor="#4EE1A0"
-                   Padding="30,0"/>
-
-                            <!-- Editar -->
-                            <Button Grid.Column="3"
-                    Text="✏️"
-                    FontSize="18"
-                    BackgroundColor="Transparent"
-                    TextColor="#4EE1A0"
-                    Clicked="OnEditarClicked"
-                    BindingContext="{Binding}"/>
-
-                            <!-- Reset Password -->
-                            <Button Grid.Column="4"
-                    Text="🔁"
-                    FontSize="18"
-                    BackgroundColor="Transparent"
-                    TextColor="#FFB74D"
-                    Clicked="OnResetPasswordClicked"
-                    BindingContext="{Binding}"/>
-
-                            <!-- Eliminar -->
-                            <Button Grid.Column="5"
-                    Text="🗑"
-                    FontSize="18"
-                    BackgroundColor="Transparent"
-                    TextColor="#EF5350"
-                    Clicked="OnEliminarClicked"
-                    BindingContext="{Binding}"/>
-
-                        </Grid>
-
-                    </Frame>
-                </DataTemplate>
-
-            </CollectionView.ItemTemplate>
-
-        </CollectionView>
-
-    </VerticalStackLayout>
+    </Grid>
 
 </ContentPage>
