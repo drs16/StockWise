@@ -56,6 +56,8 @@ public partial class LoginPage : ContentPage
             }
         }
 
+
+
         var empresaId = GetClaim(token, "EmpresaId") ?? "";
         var rol = GetClaim(token, "role");
         var nombre = GetClaim(token, "name"); 

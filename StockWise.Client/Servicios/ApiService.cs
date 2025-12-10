@@ -3,27 +3,43 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace StockWise.Client.Services;
 
+/// <summary>
+/// Servicio encargado de gestionar todas las comunicaciones entre
+/// la aplicación MAUI y la API StockWise.
+/// 
+/// Incluye:
+/// - Autenticación JWT
+/// - CRUD de productos
+/// - Gestión de usuarios
+/// - Gestión de empresa
+/// - Exportación CSV
+/// - Lectura de QR
+/// - Manejo de token y SecureStorage
+/// </summary>
 public class ApiService
 {
     private readonly HttpClient _httpClient;
     private string _token;
 
-    // 🟢 Cambia este valor según lo que quieras probar:
-    // true → Usa API local (Swagger / Visual Studio)
-    // false → Usa API en Render (producción)
+    /// <summary>
+    /// Determina si el cliente usará la API local (Swagger)
+    /// o la API desplegada en Render.
+    /// </summary>
     private readonly bool _useLocal = false;
 
     private readonly string _baseUrl;
 
+    /// <summary>
+    /// Inicializa el servicio estableciendo la URL base y configurando HttpClient.
+    /// </summary>
     public ApiService()
     {
         _baseUrl = _useLocal
-            ? "https://localhost:7013/api/"  // ✅ coincide con tu Swagger
+            ? "https://localhost:7013/api/"
             : "https://stockwise-api-82wo.onrender.com/api/";
 
         _httpClient = new HttpClient
@@ -36,95 +52,67 @@ public class ApiService
 
     public HttpClient HttpClient => _httpClient;
 
+    /// <summary>
+    /// Asigna el token JWT recibido tras el login y lo añade
+    /// automáticamente a las cabeceras Authorization.
+    /// </summary>
     public void SetToken(string token)
     {
         _token = token;
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
 
-        Console.WriteLine($"[CLIENT-TOKEN] Token asignado correctamente: {_token.Substring(0, 10)}...");
+        Console.WriteLine($"[CLIENT-TOKEN] Token asignado correctamente.");
     }
 
+    /// <summary>
+    /// Realiza el login llamando al endpoint Auth/login, obtiene el token
+    /// y guarda datos del usuario (rol, nombre, empresa) en SecureStorage.
+    /// </summary>
     public async Task<string?> LoginAsync(string email, string password)
     {
         try
         {
-            Console.WriteLine($"[CLIENT-LOGIN] Iniciando login con Email: {email}");
-
             var json = JsonSerializer.Serialize(new
             {
                 Email = email,
-                password  = password
+                password = password
             });
-
-            Console.WriteLine($"[CLIENT-LOGIN] JSON a enviar: {json}");
 
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            // 🧩 Mostrar la URL completa que se va a llamar
-            var endpoint = $"{_httpClient.BaseAddress}Auth/login";
-            Console.WriteLine($"[CLIENT-LOGIN] Intentando POST a: {endpoint}");
-            await Application.Current.MainPage.DisplayAlert("DEBUG", $"Llamando a:\n{endpoint}", "OK");
-
-            // 🚀 Ejecutar llamada
             var response = await _httpClient.PostAsync("Auth/login", content);
-
-            Console.WriteLine($"[CLIENT-LOGIN] Respuesta HTTP: {(int)response.StatusCode} - {response.StatusCode}");
-
             var responseBody = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"[CLIENT-LOGIN] Cuerpo de respuesta: {responseBody}");
 
-            if (!response.IsSuccessStatusCode)
-            {
-                var body = await response.Content.ReadAsStringAsync();
-                await Application.Current.MainPage.DisplayAlert("Error",
-                    $"HTTP {response.StatusCode}\n{body}",
-                    "OK");
-                return null;
-            }
+            if (!response.IsSuccessStatusCode) return null;
 
             using var doc = JsonDocument.Parse(responseBody);
             var token = doc.RootElement.GetProperty("token").GetString();
 
-            Console.WriteLine($"[CLIENT-LOGIN] Token recibido correctamente (longitud: {token?.Length ?? 0})");
-
-            // Leer JWT
+            // 🔍 Leer claims del JWT
             var handler = new JwtSecurityTokenHandler();
             var jwt = handler.ReadJwtToken(token);
 
-            // Guardar datos en SecureStorage
-            // NOMBRE DE USUARIO (claim estándar de Microsoft)
-            var claimNombre = jwt.Claims
-                .FirstOrDefault(c => c.Type.Contains("identity/claims/name"))
-                ?.Value ?? "";
+            await SecureStorage.SetAsync("usuario_nombre",
+                jwt.Claims.FirstOrDefault(c => c.Type.Contains("identity/claims/name"))?.Value ?? "");
 
-            await SecureStorage.SetAsync("usuario_nombre", claimNombre);
+            await SecureStorage.SetAsync("usuario_rol",
+                jwt.Claims.FirstOrDefault(c => c.Type.Contains("identity/claims/role"))?.Value ?? "");
 
-            // ROL DEL USUARIO
-            var claimRol = jwt.Claims
-                .FirstOrDefault(c => c.Type.Contains("identity/claims/role"))
-                ?.Value ?? "";
-
-            await SecureStorage.SetAsync("usuario_rol", claimRol);
-
-            // EMPRESA ID
-            var claimEmpresa = jwt.Claims
-                .FirstOrDefault(c => c.Type == "EmpresaId")
-                ?.Value ?? "";
-
-            await SecureStorage.SetAsync("empresa_id", claimEmpresa);
-
+            await SecureStorage.SetAsync("empresa_id",
+                jwt.Claims.FirstOrDefault(c => c.Type == "EmpresaId")?.Value ?? "");
 
             return token;
         }
-        catch (Exception ex)
+        catch
         {
-            Console.WriteLine($"[CLIENT-ERROR] Excepción en LoginAsync: {ex.Message}");
-            await Application.Current.MainPage.DisplayAlert("EXCEPCIÓN", ex.Message, "OK");
             return null;
         }
     }
 
+    /// <summary>
+    /// Obtiene un producto mediante su código QR.
+    /// </summary>
     public async Task<ProductoDto?> GetProductoPorQR(string codigoQR)
     {
         var response = await _httpClient.GetAsync($"Productos/porQR/{codigoQR}");
@@ -138,6 +126,9 @@ public class ApiService
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
     }
 
+    /// <summary>
+    /// Crea un nuevo producto (solo administradores).
+    /// </summary>
     public async Task<bool> CrearProductoAsync(ProductoDto producto)
     {
         var json = JsonSerializer.Serialize(producto);
@@ -146,6 +137,10 @@ public class ApiService
         var response = await _httpClient.PostAsync("Productos", content);
         return response.IsSuccessStatusCode;
     }
+
+    /// <summary>
+    /// Edita un producto existente.
+    /// </summary>
     public async Task<bool> EditarProductoAsync(int id, ProductoDto producto)
     {
         var json = JsonSerializer.Serialize(producto);
@@ -156,65 +151,48 @@ public class ApiService
         return response.IsSuccessStatusCode;
     }
 
+    /// <summary>
+    /// Elimina un producto por ID.
+    /// </summary>
     public async Task<bool> EliminarProductoAsync(int id)
     {
         var response = await _httpClient.DeleteAsync($"Productos/{id}");
         return response.IsSuccessStatusCode;
     }
 
-
-
-
+    /// <summary>
+    /// Devuelve todos los productos relacionados con la empresa del usuario.
+    /// </summary>
     public async Task<List<ProductoDto>> GetProductosAsync()
     {
         try
         {
-            Console.WriteLine("[CLIENT] GET productos con token:");
-            Console.WriteLine(_token);
-
-            Console.WriteLine("[CLIENT-PRODUCTOS] Solicitando lista de productos por empresa...");
-
-            // Recuperar empresa del usuario logueado
             var empresaIdString = await SecureStorage.GetAsync("empresa_id");
+
             if (string.IsNullOrEmpty(empresaIdString))
-            {
-                Console.WriteLine("[CLIENT-PRODUCTOS] No se encontró empresa_id");
-                await Application.Current.MainPage.DisplayAlert("Error", "No se encontró empresa asociada al usuario.", "OK");
                 return new List<ProductoDto>();
-            }
 
             int empresaId = int.Parse(empresaIdString);
 
-            // Llamar al endpoint filtrado
             var response = await _httpClient.GetAsync($"Productos/porEmpresa/{empresaId}");
 
-            Console.WriteLine($"[CLIENT-PRODUCTOS] HTTP Status: {(int)response.StatusCode} - {response.StatusCode}");
+            if (!response.IsSuccessStatusCode)
+                return new List<ProductoDto>();
 
             var json = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"[CLIENT-PRODUCTOS] Respuesta: {json}");
 
-            if (!response.IsSuccessStatusCode)
-            {
-                await Application.Current.MainPage.DisplayAlert("Error", "No se pudieron obtener los productos.", "OK");
-                return new List<ProductoDto>();
-            }
-
-            var productos = JsonSerializer.Deserialize<List<ProductoDto>>(json,
+            return JsonSerializer.Deserialize<List<ProductoDto>>(json,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
-
-            Console.WriteLine($"[CLIENT-PRODUCTOS] Productos recibidos: {productos.Count}");
-
-            return productos;
         }
-        catch (Exception ex)
+        catch
         {
-            Console.WriteLine($"[CLIENT-ERROR] Error en GetProductosAsync: {ex.Message}");
-            await Application.Current.MainPage.DisplayAlert("EXCEPCIÓN", ex.Message, "OK");
             return new List<ProductoDto>();
         }
     }
 
-
+    /// <summary>
+    /// Importa una lista de productos en bloque.
+    /// </summary>
     public async Task<bool> ImportarProductosAsync(List<ProductoDto> productos)
     {
         try
@@ -226,40 +204,38 @@ public class ApiService
 
             return response.IsSuccessStatusCode;
         }
-        catch (Exception ex)
+        catch
         {
-            Console.WriteLine($"❌ Error en ImportarProductosAsync: {ex.Message}");
             return false;
         }
     }
 
+    /// <summary>
+    /// Obtiene todos los usuarios registrados (solo administradores).
+    /// </summary>
     public async Task<List<UsuarioDto>> GetUsuariosAsync()
     {
         var token = await SecureStorage.GetAsync("jwt_token");
-
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
 
         var response = await _httpClient.GetAsync("Usuarios");
 
-        var json = await response.Content.ReadAsStringAsync();
-        Console.WriteLine("[GET-USUARIOS] Respuesta: " + json);
-
         if (!response.IsSuccessStatusCode)
             return new List<UsuarioDto>();
 
+        var json = await response.Content.ReadAsStringAsync();
+
         return JsonSerializer.Deserialize<List<UsuarioDto>>(json,
-            new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            })!;
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
     }
 
-
+    /// <summary>
+    /// Crea un usuario y devuelve la contraseña temporal generada.
+    /// </summary>
     public async Task<string> CrearUsuarioAsync(CrearUsuarioDto dto)
     {
         var token = await SecureStorage.GetAsync("jwt_token");
-
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
 
@@ -267,20 +243,18 @@ public class ApiService
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         var resp = await _httpClient.PostAsync("Usuarios", content);
-
-        string result = await resp.Content.ReadAsStringAsync();
+        var result = await resp.Content.ReadAsStringAsync();
 
         if (!resp.IsSuccessStatusCode)
-        {
-            // 👉 devolver error literal del servidor
             return $"ERROR:{result}";
-        }
 
         using var doc = JsonDocument.Parse(result);
         return doc.RootElement.GetProperty("tempPassword").GetString()!;
     }
 
-
+    /// <summary>
+    /// Elimina un usuario por ID.
+    /// </summary>
     public async Task<bool> EliminarUsuarioAsync(int id)
     {
         var token = await SecureStorage.GetAsync("jwt_token");
@@ -293,15 +267,9 @@ public class ApiService
         return response.IsSuccessStatusCode;
     }
 
-
-    private string ObtenerClaim(string token, string claimType)
-    {
-        var handler = new JwtSecurityTokenHandler();
-        var jwt = handler.ReadJwtToken(token);
-
-        return jwt.Claims.FirstOrDefault(c => c.Type == claimType)?.Value;
-    }
-
+    /// <summary>
+    /// Exporta el inventario a CSV para la empresa indicada.
+    /// </summary>
     public async Task<byte[]> ExportarCSVAsync(int empresaId)
     {
         var response = await _httpClient.GetAsync($"Productos/exportar/{empresaId}");
@@ -312,6 +280,9 @@ public class ApiService
         return await response.Content.ReadAsByteArrayAsync();
     }
 
+    /// <summary>
+    /// Obtiene información de la empresa del usuario actual.
+    /// </summary>
     public async Task<EmpresaDto?> ObtenerMiEmpresaAsync()
     {
         var empresaIdString = await SecureStorage.GetAsync("empresa_id");
@@ -332,7 +303,9 @@ public class ApiService
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
     }
 
-
+    /// <summary>
+    /// Actualiza los datos de una empresa.
+    /// </summary>
     public async Task<bool> ActualizarEmpresaAsync(int id, EmpresaDto empresa)
     {
         var json = JsonSerializer.Serialize(empresa);
@@ -343,73 +316,50 @@ public class ApiService
         return response.IsSuccessStatusCode;
     }
 
+    /// <summary>
+    /// Obtiene un producto mediante un código QR validando token y formato.
+    /// </summary>
     public async Task<ProductoDto?> GetProductoByQRAsync(string qr)
     {
         if (string.IsNullOrWhiteSpace(qr))
             return null;
 
-        // 🟢 1. Cargar token SI NO ESTÁ ASIGNADO
+        // Asegurar token cargado
         if (string.IsNullOrEmpty(_token))
         {
             var storedToken = await SecureStorage.GetAsync("jwt_token");
-
             if (!string.IsNullOrEmpty(storedToken))
             {
                 _token = storedToken;
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", storedToken);
-
-                Console.WriteLine("[CLIENT] Token cargado automáticamente en GetProductoByQRAsync.");
-            }
-            else
-            {
-                Console.WriteLine("[CLIENT] No hay token almacenado para cargar.");
             }
         }
 
-        // 🟢 2. Construir QR de forma segura
         var safe = Uri.EscapeDataString(qr);
 
-        // 🟢 3. RUTA CORRECTA SEGÚN TU API
         var resp = await _httpClient.GetAsync($"Productos/porQR/{safe}");
 
-        // 🔴 Si devuelve 401, 404 o error → NULL
         if (!resp.IsSuccessStatusCode)
-        {
-            Console.WriteLine($"[CLIENT] ERROR HTTP {resp.StatusCode} al buscar producto por QR.");
             return null;
-        }
 
-        // 🟢 4. Convertir JSON → objeto
-        var producto = await resp.Content.ReadFromJsonAsync<ProductoDto?>(
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-        );
-
-        return producto;
+        return await resp.Content.ReadFromJsonAsync<ProductoDto?>(
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
     }
 
-
-
+    /// <summary>
+    /// Actualiza el stock de un producto.
+    /// </summary>
     public async Task<bool> UpdateStockAsync(ProductoDto producto)
     {
-        // 🟢 1. Cargar token SI NO ESTÁ ASIGNADO
         if (string.IsNullOrEmpty(_token))
         {
             var storedToken = await SecureStorage.GetAsync("jwt_token");
-
-            if (!string.IsNullOrEmpty(storedToken))
-            {
-                _token = storedToken;
-                _httpClient.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", storedToken);
-
-                Console.WriteLine("[CLIENT] Token cargado automáticamente en UpdateStockAsync.");
-            }
-            else
-            {
-                Console.WriteLine("[CLIENT] No hay token almacenado para cargar.");
-            }
+            _token = storedToken;
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", storedToken);
         }
+
         var response = await _httpClient.PutAsJsonAsync(
             $"Productos/{producto.Id}",
             producto
@@ -418,6 +368,9 @@ public class ApiService
         return response.IsSuccessStatusCode;
     }
 
+    /// <summary>
+    /// Resetea la contraseña de un usuario (solo administradores).
+    /// </summary>
     public async Task<string?> ResetearPassword(int usuarioId)
     {
         var token = await SecureStorage.GetAsync("jwt_token");
@@ -431,13 +384,14 @@ public class ApiService
             return null;
 
         var json = await resp.Content.ReadAsStringAsync();
-
         using var doc = JsonDocument.Parse(json);
 
         return doc.RootElement.GetProperty("tempPassword").GetString();
     }
 
-
+    /// <summary>
+    /// Permite que el usuario cambie su propia contraseña.
+    /// </summary>
     public async Task<bool> CambiarMiPassword(string nueva)
     {
         var token = await SecureStorage.GetAsync("jwt_token");
@@ -447,22 +401,14 @@ public class ApiService
         var json = JsonSerializer.Serialize(new { NuevaPassword = nueva });
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var url = "Usuarios/cambiarPassword";
-
-        Console.WriteLine("==== CAMBIAR PASSWORD DEBUG ====");
-        Console.WriteLine("Token actual: " + token);
-        Console.WriteLine("URL: " + _httpClient.BaseAddress + url);
-        Console.WriteLine("JSON enviado: " + json);
-
-        var response = await _httpClient.PostAsync(url, content);
-
-        var body = await response.Content.ReadAsStringAsync();
-        Console.WriteLine("[CP] Status: " + response.StatusCode);
-        Console.WriteLine("[CP] Body: " + body);
+        var response = await _httpClient.PostAsync("Usuarios/cambiarPassword", content);
 
         return response.IsSuccessStatusCode;
     }
 
+    /// <summary>
+    /// Actualiza los datos de un usuario.
+    /// </summary>
     public async Task<bool> ActualizarUsuarioAsync(UsuarioDto usuario)
     {
         var token = await SecureStorage.GetAsync("jwt_token");
@@ -483,7 +429,9 @@ public class ApiService
         return response.IsSuccessStatusCode;
     }
 
-
+    /// <summary>
+    /// Obtiene los movimientos de stock de la empresa para auditorías.
+    /// </summary>
     public async Task<List<MovimientoStockDto>> GetMovimientosAsync(int empresaId)
     {
         var token = await SecureStorage.GetAsync("jwt_token");
@@ -501,8 +449,4 @@ public class ApiService
         return JsonSerializer.Deserialize<List<MovimientoStockDto>>(json,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
     }
-
-
-
-
 }
