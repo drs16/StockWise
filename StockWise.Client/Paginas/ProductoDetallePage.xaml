@@ -89,7 +89,9 @@
             <!-- Botones de acción -->
             <HorizontalStackLayout Spacing="15" Margin="0,20,0,0" HorizontalOptions="Center">
 
+
                 <Button Text="✏ Editar"
+                        x:Name="BtnEditar"
                         Clicked="OnEditarClicked"
                         BackgroundColor="#4EE1A0"
                         TextColor="#0A0F1C"
@@ -98,7 +100,9 @@
                         WidthRequest="130"
                         HeightRequest="50"/>
 
-                <Button Text="🗑 Eliminar"
+                <Button 
+                        x:Name="BtnEliminar"
+                        Text="🗑 Eliminar"
                         Clicked="OnEliminarClicked"
                         BackgroundColor="#c62828"
                         TextColor="White"

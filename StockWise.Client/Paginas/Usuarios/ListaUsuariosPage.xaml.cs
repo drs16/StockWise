@@ -30,7 +30,7 @@ public partial class ListaUsuariosPage : ContentPage
     {
         Loading();
 
-       var empresaIdString = await SecureStorage.GetAsync("empresa_id");
+        var empresaIdString = await SecureStorage.GetAsync("empresa_id");
 
         if (string.IsNullOrEmpty(empresaIdString))
         {
@@ -98,13 +98,13 @@ public partial class ListaUsuariosPage : ContentPage
 
     private async void OnPerfilClicked(object sender, EventArgs e)
     {
-       
-        await Navigation.PushAsync(new MiPerfilPage());
+
+        await Navigation.PushAsync(new MiPerfilPage(_apiService));
     }
 
     private async void OnAdminClicked(object sender, EventArgs e)
     {
-        await Navigation.PushAsync(new ListaUsuariosPage(_apiService)); // Si estás ya aquí, no hagas nada
+        await Navigation.PushAsync(new ListaUsuariosPage(_apiService));
     }
 
     private async void OnLogoutClicked(object sender, EventArgs e)

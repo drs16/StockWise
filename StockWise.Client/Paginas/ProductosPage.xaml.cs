@@ -1,6 +1,8 @@
-﻿using StockWise.Client.Modelo;
+﻿using StockWise.Client.Componentes;
+using StockWise.Client.Modelo;
 using StockWise.Client.Services;
 using Microsoft.Maui.ApplicationModel.DataTransfer;
+
 #if WINDOWS
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -9,15 +11,12 @@ using Microsoft.UI.Xaml;
 using Microsoft.Maui.Platform;
 #endif
 
-
 namespace StockWise.Client.Paginas;
 
 public partial class ProductosPage : ContentPage
 {
     private readonly ApiService _apiService;
-
     private bool menuVisible = false;
-
 
     public ProductosPage()
     {
@@ -27,7 +26,7 @@ public partial class ProductosPage : ContentPage
 #if ANDROID
         BtnQR.IsVisible = true;
 #else
-    BtnQR.IsVisible = false;
+        BtnQR.IsVisible = false;
 #endif
     }
 
@@ -36,6 +35,16 @@ public partial class ProductosPage : ContentPage
         base.OnAppearing();
         await AplicarPermisosUsuario();
         await CargarProductosAsync();
+    }
+
+    /// <summary>
+    /// Muestra un popup modal personalizado con botón OK.
+    /// </summary>
+    private async Task MostrarPopup(string titulo, string mensaje)
+    {
+        var popup = new MensajeModalPage(titulo, mensaje);
+        await Navigation.PushModalAsync(popup);
+        await popup.EsperarCierre;
     }
 
     private async Task CargarProductosAsync()
@@ -61,12 +70,11 @@ public partial class ProductosPage : ContentPage
                 ProductosList.ItemsSource = productos;
                 ProductosList.IsVisible = true;
                 EmptyState.IsVisible = false;
-
             }
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", $"No se pudieron cargar los productos.\n{ex.Message}", "OK");
+            await MostrarPopup("Error", $"No se pudieron cargar los productos.\n{ex.Message}");
         }
         finally
         {
@@ -98,10 +106,13 @@ public partial class ProductosPage : ContentPage
     {
         try
         {
-            var confirmar = await DisplayAlert(
+            var popupConfirm = new ConfirmacionModalPage(
                 "Importar productos",
-                "¿Deseas importar productos desde un archivo CSV?",
-                "Sí", "No");
+                "¿Deseas importar productos desde un archivo CSV?"
+            );
+
+            await Navigation.PushModalAsync(popupConfirm);
+            bool confirmar = await popupConfirm.EsperarRespuesta;
 
             if (!confirmar)
                 return;
@@ -122,7 +133,7 @@ public partial class ProductosPage : ContentPage
 
             if (resultado == null)
             {
-                await DisplayAlert("Cancelado", "No se seleccionó ningún archivo.", "OK");
+                await MostrarPopup("Cancelado", "No se seleccionó ningún archivo.");
                 return;
             }
 
@@ -135,7 +146,7 @@ public partial class ProductosPage : ContentPage
 
             if (lineas.Count < 2)
             {
-                await DisplayAlert("Error", "El archivo CSV está vacío.", "OK");
+                await MostrarPopup("Error", "El archivo CSV está vacío.");
                 return;
             }
 
@@ -168,13 +179,13 @@ public partial class ProductosPage : ContentPage
                     Cantidad = cantidad,
                     Precio = precio,
                     CodigoQR = codigoQR,
-                    EmpresaId = 1
+                    EmpresaId = int.Parse(await SecureStorage.GetAsync("empresa_id"))
                 });
             }
 
             if (!productos.Any())
             {
-                await DisplayAlert("Error", "No se encontraron productos válidos.", "OK");
+                await MostrarPopup("Error", "No se encontraron productos válidos.");
                 return;
             }
 
@@ -184,17 +195,17 @@ public partial class ProductosPage : ContentPage
 
             if (ok)
             {
-                await DisplayAlert("Éxito", "Productos importados correctamente", "OK");
+                await MostrarPopup("Éxito", "Productos importados correctamente.");
                 await CargarProductosAsync();
             }
             else
             {
-                await DisplayAlert("Error", "No se pudieron importar los productos", "OK");
+                await MostrarPopup("Error", "No se pudieron importar los productos.");
             }
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", ex.Message, "OK");
+            await MostrarPopup("Error", ex.Message);
         }
         finally
         {
@@ -204,10 +215,9 @@ public partial class ProductosPage : ContentPage
 
     private async void OnScanearClicked(object sender, EventArgs e)
     {
-        await DisplayAlert("QR", "Aquí abrirás el lector de QR", "OK");
+        await MostrarPopup("QR", "Aquí abrirás el lector de QR.");
     }
 
-    // Cierra el menú (centraliza la lógica)
     private async Task CloseMenu()
     {
         if (menuVisible)
@@ -221,8 +231,6 @@ public partial class ProductosPage : ContentPage
     private async void OnAdminClicked(object sender, EventArgs e)
     {
         await CloseMenu();
-
-        // Navegar a la página de usuarios (asegúrate de que ListaUsuariosPage tiene un constructor que acepte ApiService)
         await Navigation.PushAsync(new Paginas.Usuarios.ListaUsuariosPage(_apiService));
     }
 
@@ -236,13 +244,11 @@ public partial class ProductosPage : ContentPage
     {
         if (menuVisible)
         {
-            // Ocultar menú
             await MenuContainer.FadeTo(0, 150);
             MenuContainer.IsVisible = false;
         }
         else
         {
-            // Mostrar menú
             MenuContainer.Opacity = 0;
             MenuContainer.IsVisible = true;
             await MenuContainer.FadeTo(1, 150);
@@ -254,7 +260,7 @@ public partial class ProductosPage : ContentPage
     private async void OnPerfilClicked(object sender, EventArgs e)
     {
         await CloseMenu();
-        await Navigation.PushAsync(new MiPerfilPage());
+        await Navigation.PushAsync(new MiPerfilPage(_apiService));
     }
 
     private async Task AplicarPermisosUsuario()
@@ -263,13 +269,11 @@ public partial class ProductosPage : ContentPage
 
         bool esAdmin = rol?.ToLower() == "administrador";
 
-        // Ocultar botones si no es admin
         BtnCrearProducto.IsVisible = esAdmin;
         BtnImportar.IsVisible = esAdmin;
         BtnAdmin.IsVisible = esAdmin;
         BtnExportar.IsVisible = esAdmin;
-        BtnEditarEmpresa.IsVisible = esAdmin; // <- AÑADIDO
-
+        BtnEditarEmpresa.IsVisible = esAdmin;
     }
 
     private async void OnExportarClicked(object sender, EventArgs e)
@@ -281,38 +285,34 @@ public partial class ProductosPage : ContentPage
 
             if (bytes == null)
             {
-                await DisplayAlert("Error", "No se pudo exportar el CSV", "OK");
+                await MostrarPopup("Error", "No se pudo exportar el CSV.");
                 return;
             }
 
             var fileName = "productos.csv";
 
 #if WINDOWS
-        // --- EXPORTAR EN WINDOWS PC ---
-        var savePicker = new FileSavePicker();
+            var savePicker = new FileSavePicker();
+            var window = App.Current.Windows[0].Handler.PlatformView as MauiWinUIWindow;
+            InitializeWithWindow.Initialize(savePicker, window.WindowHandle);
 
-        // Necesario en MAUI WinUI
-        var window = App.Current.Windows[0].Handler.PlatformView as MauiWinUIWindow;
-        InitializeWithWindow.Initialize(savePicker, window.WindowHandle);
+            savePicker.SuggestedFileName = fileName;
+            savePicker.FileTypeChoices.Add("CSV File", new List<string>() { ".csv" });
 
-        savePicker.SuggestedFileName = fileName;
-        savePicker.FileTypeChoices.Add("CSV File", new List<string>() { ".csv" });
+            StorageFile file = await savePicker.PickSaveFileAsync();
 
-        StorageFile file = await savePicker.PickSaveFileAsync();
+            if (file != null)
+            {
+                using var stream = await file.OpenStreamForWriteAsync();
+                stream.Write(bytes, 0, bytes.Length);
 
-        if (file != null)
-        {
-            using var stream = await file.OpenStreamForWriteAsync();
-            stream.Write(bytes, 0, bytes.Length);
-
-            await DisplayAlert("Éxito", $"Archivo guardado en:\n{file.Path}", "OK");
-        }
-        else
-        {
-            await DisplayAlert("Cancelado", "No se guardó el archivo.", "OK");
-        }
+                await MostrarPopup("Éxito", $"Archivo guardado en:\n{file.Path}");
+            }
+            else
+            {
+                await MostrarPopup("Cancelado", "No se guardó el archivo.");
+            }
 #else
-            // --- ANDROID / iOS ---
             var filePath = Path.Combine(FileSystem.CacheDirectory, fileName);
             File.WriteAllBytes(filePath, bytes);
 
@@ -325,7 +325,7 @@ public partial class ProductosPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", ex.Message, "OK");
+            await MostrarPopup("Error", ex.Message);
         }
     }
 
@@ -353,7 +353,4 @@ public partial class ProductosPage : ContentPage
         await CloseMenu();
         await Navigation.PushAsync(new MovimientoStockPage(_apiService));
     }
-
-
-
 }

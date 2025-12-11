@@ -28,17 +28,24 @@ public partial class EditarUsuarioPage : ContentPage
 
         if (ok)
         {
+            // Mostrar popup de éxito
             var popup = new MensajeModalPage("Éxito", "Usuario modificado con éxito.");
             await Navigation.PushModalAsync(popup);
-            await popup.EsperarCierre;
+            await popup.EsperarCierre;   // <-- el modal se cierra aquí
 
+            // 🔥 Espera corta para evitar crash al navegar en Android
+            await Task.Delay(50);
+
+            // Volver atrás
             await Navigation.PopAsync();
+            return;
         }
-        else
-        {
-            var popup = new MensajeModalPage("Error", "No se pudo modificar el usuario.");
-            await Navigation.PushModalAsync(popup);
-            await popup.EsperarCierre;
-        }
+
+        // ERROR
+        var popupErr = new MensajeModalPage("Error", "No se pudo modificar el usuario.");
+        await Navigation.PushModalAsync(popupErr);
+        await popupErr.EsperarCierre;
+
+        await Task.Delay(50);
     }
 }

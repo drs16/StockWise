@@ -42,12 +42,12 @@ namespace StockWise.Client.Paginas
                 await DisplayAlert("Error", ex.Message, "OK");
             }
         }
-    
 
 
 
 
-private void OnAddClicked(object sender, EventArgs e)
+
+        private void OnAddClicked(object sender, EventArgs e)
         {
             if (int.TryParse(CantidadEntry.Text, out int cantidad) && cantidad > 0)
             {

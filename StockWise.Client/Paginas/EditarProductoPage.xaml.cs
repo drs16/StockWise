@@ -30,7 +30,7 @@ public partial class EditarProductoPage : ContentPage
             Proveedor = ProveedorEntry.Text,
             Cantidad = int.Parse(CantidadEntry.Text),
             Precio = decimal.Parse(PrecioEntry.Text),
-            CodigoQR = "" 
+            CodigoQR = ""
         };
 
         var exito = await _apiService.EditarProductoAsync(_productoId, productoEditado);

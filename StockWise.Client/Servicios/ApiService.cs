@@ -352,21 +352,14 @@ public class ApiService
     /// </summary>
     public async Task<bool> UpdateStockAsync(ProductoDto producto)
     {
-        if (string.IsNullOrEmpty(_token))
-        {
-            var storedToken = await SecureStorage.GetAsync("jwt_token");
-            _token = storedToken;
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", storedToken);
-        }
+        var dto = new { NuevaCantidad = producto.Cantidad };
 
-        var response = await _httpClient.PutAsJsonAsync(
-            $"Productos/{producto.Id}",
-            producto
-        );
+        var response = await _httpClient.PostAsJsonAsync(
+            $"Productos/{producto.Id}/actualizarStock", dto);
 
         return response.IsSuccessStatusCode;
     }
+
 
     /// <summary>
     /// Resetea la contraseña de un usuario (solo administradores).
@@ -449,4 +442,25 @@ public class ApiService
         return JsonSerializer.Deserialize<List<MovimientoStockDto>>(json,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
     }
+
+    /// <summary>
+    /// Obtiene Todas las empresas.
+    /// </summary>
+    public async Task<EmpresaDto?> GetEmpresaAsync(int id)
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync($"Empresas/{id}");
+
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            return await response.Content.ReadFromJsonAsync<EmpresaDto>();
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
 }

@@ -276,6 +276,27 @@ namespace StockWise.api.Controlador
             return Ok(movimientos);
         }
 
+        [Authorize]  // cualquier usuario logueado
+        [HttpPost("{id}/actualizarStock")]
+        public async Task<IActionResult> ActualizarStock(int id, CambiarStockDto dto)
+        {
+            var empresaId = ObtenerEmpresaId();
+
+            var producto = await _context.Productos
+                .FirstOrDefaultAsync(p => p.Id == id && p.EmpresaId == empresaId);
+
+            if (producto == null)
+                return NotFound("Producto no encontrado");
+
+            // actualizar solo stock
+            producto.Cantidad = dto.NuevaCantidad;
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+
 
     }
 }

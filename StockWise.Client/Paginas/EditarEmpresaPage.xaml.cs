@@ -1,4 +1,4 @@
-using StockWise.Client.Modelo;
+﻿using StockWise.Client.Modelo;
 using StockWise.Client.Services;
 
 namespace StockWise.Client.Paginas;
@@ -57,7 +57,7 @@ public partial class EditarEmpresaPage : ContentPage
 
         if (ok)
         {
-            await DisplayAlert("�xito", "Datos actualizados correctamente.", "OK");
+            await DisplayAlert("Éxito", "Datos actualizados correctamente.", "OK");
             await Navigation.PopAsync();
         }
         else

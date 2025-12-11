@@ -1,4 +1,4 @@
-using StockWise.Client.Modelo;
+﻿using StockWise.Client.Modelo;
 using StockWise.Client.Services;
 
 namespace StockWise.Client.Paginas;
@@ -26,7 +26,7 @@ public partial class CrearProductoPage : ContentPage
 
         if (await _apiService.CrearProductoAsync(producto))
         {
-            await DisplayAlert("�xito", "Producto creado", "OK");
+            await DisplayAlert("Éxito", "Producto creado", "OK");
             await Navigation.PopAsync();
         }
         else

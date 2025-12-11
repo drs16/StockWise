@@ -16,7 +16,9 @@ public partial class LoginPage : ContentPage
 
     private async void OnLoginClicked(object sender, EventArgs e)
     {
-        MessageLabel.Text = "";
+        try
+        {
+            MessageLabel.Text = "";
         var email = EmailEntry.Text;
         var password = PasswordEntry.Text;
 
@@ -25,91 +27,104 @@ public partial class LoginPage : ContentPage
 
         if (string.IsNullOrEmpty(token))
         {
-            MessageLabel.Text = "Credenciales inválidas.";
+            var popupError = new MensajeModalPage("Error", "Credenciales inválidas.");
+            await Navigation.PushModalAsync(popupError);
+            await popupError.EsperarCierre;
             return;
         }
 
-        // Guardar token (siempre no nulo)
+        // Guardar token
         await SecureStorage.SetAsync("jwt_token", token);
-
         _apiService.SetToken(token);
 
-
-        // Extraer claims de forma robusta
+        // FUNCION AUXILIAR PARA LEER CLAIMS
         string GetClaim(string t, string claimTypeOrPartial)
         {
             if (string.IsNullOrEmpty(t)) return "";
             try
             {
-                var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+                var handler = new JwtSecurityTokenHandler();
                 var jwt = handler.ReadJwtToken(t);
-                // Primero buscar claim exacto (EmpresaId)
+
                 var exact = jwt.Claims.FirstOrDefault(c => c.Type == claimTypeOrPartial);
                 if (exact != null) return exact.Value;
-                // Luego buscar por sufijo/substring común (name, role)
-                var partial = jwt.Claims.FirstOrDefault(c => c.Type != null && c.Type.Contains(claimTypeOrPartial));
+
+                var partial = jwt.Claims.FirstOrDefault(c => c.Type.Contains(claimTypeOrPartial));
                 return partial?.Value ?? "";
             }
-            catch
-            {
-                return "";
-            }
+            catch { return ""; }
         }
 
-
-
-        var empresaId = GetClaim(token, "EmpresaId") ?? "";
+        var empresaId = GetClaim(token, "EmpresaId");
         var rol = GetClaim(token, "role");
-        var nombre = GetClaim(token, "name"); 
-                                              // nombre o email: si nombre vacío, usamos el email que ya conocemos
-        var usuarioNombre = string.IsNullOrEmpty(nombre) ? email : nombre;
+        var nombre = GetClaim(token, "name");
         var debeCambiar = GetClaim(token, "DebeCambiarPassword") ?? "false";
-        await SecureStorage.SetAsync("debe_cambiar", debeCambiar);
-        // Guardar seguros (nunca pasar null)
+
+        var usuarioNombre = string.IsNullOrEmpty(nombre) ? email : nombre;
+
+        // GUARDAR DATOS EN SECURE STORAGE
         await SecureStorage.SetAsync("empresa_id", empresaId ?? "");
         await SecureStorage.SetAsync("usuario_rol", rol ?? "");
         await SecureStorage.SetAsync("usuario_nombre", usuarioNombre ?? "");
         await SecureStorage.SetAsync("usuario_email", email ?? "");
+        await SecureStorage.SetAsync("debe_cambiar", debeCambiar);
 
-        if (string.IsNullOrEmpty(empresaId))
+            var popup = new MensajeModalPage("Éxito", "Inicio de sesión correcto");
+
+            // Mostrar modal
+            await App.Current.MainPage.Navigation.PushModalAsync(popup);
+
+            // Esperar cierre SIN bloquear el hilo principal
+            var result = await popup.EsperarCierre.ConfigureAwait(false);
+
+            // Volver al hilo principal ANTES de navegar
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                // Aquí ya es SEGURO hacer navegación
+                await ContinuarDespuesDelLogin();
+            });
+
+
+            // SI EL USUARIO DEBE CAMBIAR CONTRASEÑA
+            if (debeCambiar == "True")
         {
-            await DisplayAlert("Aviso", "EmpresaId no se encontró en el token. Comprueba el token o el servidor.", "OK");
-        }
+            var popupCambiar = new MensajeModalPage("Aviso",
+                "Debes cambiar tu contraseña antes de continuar.");
+            await Navigation.PushModalAsync(popupCambiar);
+            await popupCambiar.EsperarCierre;
 
-        var popup = new MensajeModalPage("Éxito", "Inicio de sesión correcto");
-        await Navigation.PushModalAsync(popup);
-        await popup.EsperarCierre;  
-
-
-        var flag = await SecureStorage.GetAsync("debe_cambiar");
-
-        if (flag == "True")
-        {
-            await DisplayAlert("Aviso", "Debes cambiar tu contraseña antes de continuar.", "OK");
             await Shell.Current.GoToAsync("//CambiarPassword");
             return;
         }
 
-
-        // Navegar (ya guardamos rol)
-        if ((rol ?? "").ToLower() != "administrador")
-            await Shell.Current.GoToAsync("//productos");
-        else
-            await Shell.Current.GoToAsync("//productos");
+        // NAVEGACIÓN SEGÚN ROL
+        await Shell.Current.GoToAsync("//productos");
     }
-
-
-    public string ObtenerClaim(string token, string claimType)
+    catch (Exception ex)
     {
-        var handler = new JwtSecurityTokenHandler();
-        var jwt = handler.ReadJwtToken(token);
-
-        return jwt.Claims.FirstOrDefault(c => c.Type == claimType)?.Value;
+        await DisplayAlert("ERROR ANDROID", ex.ToString(), "OK");
+}
     }
 
     private async void OnRegistrarEmpresaClicked(object sender, EventArgs e)
     {
         await Shell.Current.GoToAsync("RegistroInicialPage");
     }
+
+    private async Task ContinuarDespuesDelLogin()
+    {
+        var flag = await SecureStorage.GetAsync("debe_cambiar");
+
+        if (flag == "True")
+        {
+            await Shell.Current.GoToAsync("//CambiarPassword");
+            return;
+        }
+
+        var rol = await SecureStorage.GetAsync("usuario_rol");
+
+        await Shell.Current.GoToAsync("//productos");
+    }
+
 
 }

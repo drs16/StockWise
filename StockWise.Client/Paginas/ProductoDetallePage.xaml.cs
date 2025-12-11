@@ -1,4 +1,4 @@
-using StockWise.Client.Modelo;
+ï»¿using StockWise.Client.Modelo;
 using StockWise.Client.Services;
 
 namespace StockWise.Client.Paginas;
@@ -22,7 +22,7 @@ public partial class ProductoDetallePage : ContentPage
         NombreLabel.Text = _producto.Nombre;
         ProveedorLabel.Text = _producto.Proveedor;
         CantidadLabel.Text = _producto.Cantidad.ToString();
-        PrecioLabel.Text = _producto.Precio.ToString("0.00 €");
+        PrecioLabel.Text = _producto.Precio.ToString("0.00 â‚¬");
 
         // Mostrar QR como imagen (debes generarlo en tu API o localmente)
         if (!string.IsNullOrEmpty(_producto.CodigoQR))
@@ -48,7 +48,7 @@ public partial class ProductoDetallePage : ContentPage
     private async void OnEliminarClicked(object sender, EventArgs e)
     {
         var confirmar = await DisplayAlert("Eliminar producto",
-            "¿Seguro que deseas eliminar este producto?", "Sí", "No");
+            "Â¿Seguro que deseas eliminar este producto?", "SÃ­", "No");
 
         if (!confirmar)
             return;
@@ -57,8 +57,8 @@ public partial class ProductoDetallePage : ContentPage
 
         if (exito)
         {
-            await DisplayAlert("Éxito", "Producto eliminado.", "OK");
-            await Shell.Current.GoToAsync(".."); // volver atrás
+            await DisplayAlert("Ã‰xito", "Producto eliminado.", "OK");
+            await Shell.Current.GoToAsync(".."); // volver atrÃ¡s
         }
         else
         {
