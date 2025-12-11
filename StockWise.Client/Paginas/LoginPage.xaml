@@ -74,7 +74,8 @@
         FontSize="14"
         BackgroundColor="Transparent"
         TextColor="White"
-        Clicked="OnRegistrarEmpresaClicked"/>
+        Clicked="OnRegistrarEmpresaClicked"
+                        IsVisible="False"/>
 
 
             </VerticalStackLayout>
